@@ -1,0 +1,106 @@
+USE MultiTenantSaaS_DB;
+GO
+
+-- 1. Identity & Access Management
+CREATE TABLE Roles (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    Name NVARCHAR(255) NOT NULL,
+    INDEX IX_Roles_TenantId (TenantId)
+);
+
+CREATE TABLE Users (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    Username NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(255) NOT NULL,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    RoleId UNIQUEIDENTIFIER,
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE(),
+    IsActive BIT DEFAULT 1,
+    FOREIGN KEY (RoleId) REFERENCES Roles(Id),
+    INDEX IX_Users_TenantId (TenantId)
+);
+
+-- 2. Commerce & Logistics
+CREATE TABLE Orders (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    TotalAmount DECIMAL(18, 2) NOT NULL,
+    Status NVARCHAR(50) DEFAULT 'Pending',
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE(),
+    FOREIGN KEY (UserId) REFERENCES Users(Id),
+    INDEX IX_Orders_TenantId (TenantId)
+);
+
+CREATE TABLE OrderItems (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    OrderId UNIQUEIDENTIFIER NOT NULL,
+    ProductId UNIQUEIDENTIFIER NOT NULL,
+    Quantity INT NOT NULL,
+    UnitPrice DECIMAL(18, 2) NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES Orders(Id),
+    FOREIGN KEY (ProductId) REFERENCES Products(Id),
+    INDEX IX_OrderItems_TenantId (TenantId)
+);
+
+CREATE TABLE Payments (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    OrderId UNIQUEIDENTIFIER NOT NULL,
+    Amount DECIMAL(18, 2) NOT NULL,
+    Method NVARCHAR(50),
+    Status NVARCHAR(50),
+    TransactionId NVARCHAR(255),
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE(),
+    FOREIGN KEY (OrderId) REFERENCES Orders(Id),
+    INDEX IX_Payments_TenantId (TenantId)
+);
+
+-- 3. Subscriptions & Billing
+CREATE TABLE Subscriptions (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    PlanName NVARCHAR(255) NOT NULL,
+    Price DECIMAL(18, 2) NOT NULL,
+    StartDate DATETIME2 NOT NULL,
+    EndDate DATETIME2,
+    IsActive BIT DEFAULT 1,
+    INDEX IX_Subscriptions_TenantId (TenantId)
+);
+
+CREATE TABLE Invoices (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    OrderId UNIQUEIDENTIFIER NOT NULL,
+    InvoiceNumber NVARCHAR(255) NOT NULL,
+    IssueDate DATETIME2 DEFAULT GETUTCDATE(),
+    DueDate DATETIME2,
+    TotalAmount DECIMAL(18, 2) NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES Orders(Id),
+    INDEX IX_Invoices_TenantId (TenantId)
+);
+
+-- 4. Logs & Notifications
+CREATE TABLE AuditLogs (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    UserId NVARCHAR(255),
+    Action NVARCHAR(MAX),
+    Timestamp DATETIME2 DEFAULT GETUTCDATE(),
+    INDEX IX_AuditLogs_TenantId (TenantId)
+);
+
+CREATE TABLE Notifications (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    TenantId NVARCHAR(255) NOT NULL,
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    Message NVARCHAR(MAX) NOT NULL,
+    IsRead BIT DEFAULT 0,
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE(),
+    FOREIGN KEY (UserId) REFERENCES Users(Id),
+    INDEX IX_Notifications_TenantId (TenantId)
+);
+GO

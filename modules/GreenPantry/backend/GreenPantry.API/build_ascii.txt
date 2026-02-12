@@ -1,0 +1,32 @@
+  Determining projects to restore...
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52 [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+  All projects are up-to-date for restore.
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52
+  GreenPantry.Domain -> D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Domain\bin\Debug\net8.0\GreenPantry.Domain.dll
+  GreenPantry.Application -> D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\bin\Debug\net8.0\GreenPantry.Application.dll
+  GreenPantry.Infrastructure -> D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Infrastructure\bin\Debug\net8.0\GreenPantry.Infrastructure.dll
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Extensions\ServiceCollectionExtensions.cs(29,84): warning CS8604: Possible null reference argument for parameter 's' in 'byte[] Encoding.GetBytes(string s)'. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Program.cs(41,36): error CS1503: Argument 2: cannot convert from 'Microsoft.Extensions.Configuration.ConfigurationManager' to 'string' [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Controllers\AuthController.cs(225,103): warning CS8604: Possible null reference argument for parameter 'json' in 'Dictionary<string, object>? JsonSerializer.Deserialize<Dictionary<string, object>>(string json, JsonSerializerOptions? options = null)'. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Controllers\AuthController.cs(226,26): warning CS8602: Dereference of a possibly null reference. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+
+Build FAILED.
+
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52 [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.Application\GreenPantry.Application.csproj : warning NU1902: Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Extensions\ServiceCollectionExtensions.cs(29,84): warning CS8604: Possible null reference argument for parameter 's' in 'byte[] Encoding.GetBytes(string s)'. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Controllers\AuthController.cs(225,103): warning CS8604: Possible null reference argument for parameter 'json' in 'Dictionary<string, object>? JsonSerializer.Deserialize<Dictionary<string, object>>(string json, JsonSerializerOptions? options = null)'. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Controllers\AuthController.cs(226,26): warning CS8602: Dereference of a possibly null reference. [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\Program.cs(41,36): error CS1503: Argument 2: cannot convert from 'Microsoft.Extensions.Configuration.ConfigurationManager' to 'string' [D:\Rajeev\Projects\7. Greenpantry\backend\GreenPantry.API\GreenPantry.API.csproj]
+    9 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:04.13

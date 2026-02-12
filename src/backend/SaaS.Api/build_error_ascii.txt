@@ -1,0 +1,7 @@
+D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Application\Services\AuthService.cs(27,57): error CS1061: 'IGenericRepository<User>' does not contain a definition for 'GetQueryable' and no accessible extension method 'GetQueryable' accepting a first argument of type 'IGenericRepository<User>' could be found (are you missing a using directive or an assembly reference?) [D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Application\SaaS.Application.csproj]
+
+Build FAILED.
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.94

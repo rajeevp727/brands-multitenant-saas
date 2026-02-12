@@ -1,0 +1,119 @@
+[
+    {
+        "Slug": "green-pantry-kitchen",
+        "Name": "Green Pantry Kitchen",
+        "Description": "Healthy and Fresh Food",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": [
+            "Healthy",
+            "Indian"
+        ],
+        "Address": {
+            "Street": "789 Food Court",
+            "City": "Bangalore",
+            "State": "KA",
+            "PostalCode": "560001",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.8,
+        "ReviewCount": 124,
+        "EstimatedDeliveryTime": 30,
+        "DeliveryFee": 50,
+        "ImageUrl": "https://images.unsplash.com/photo-1543353071-10c8ba85a904?w=800"
+    },
+    {
+        "Slug": "spice-village",
+        "Name": "Spice Village",
+        "Description": "Authentic North Indian Cuisine",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": [
+            "Indian",
+            "North Indian"
+        ],
+        "Address": {
+            "Street": "101 Masala Lane",
+            "City": "Bangalore",
+            "State": "KA",
+            "PostalCode": "560034",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.5,
+        "ReviewCount": 89,
+        "EstimatedDeliveryTime": 45,
+        "DeliveryFee": 30,
+        "ImageUrl": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
+    },
+    {
+        "Slug": "healthy-bowls",
+        "Name": "Healthy Bowls",
+        "Description": "Organic and Nutritious Meals",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": [
+            "Healthy",
+            "Salads",
+            "Vegan"
+        ],
+        "Address": {
+            "Street": "22 Wellness Way",
+            "City": "Bangalore",
+            "State": "KA",
+            "PostalCode": "560102",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.7,
+        "ReviewCount": 56,
+        "EstimatedDeliveryTime": 25,
+        "DeliveryFee": 40,
+        "ImageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800"
+    },
+    {
+        "Slug": "burger-house",
+        "Name": "Burger House",
+        "Description": "Original American Style Burgers",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": [
+            "American",
+            "Fast Food"
+        ],
+        "Address": {
+            "Street": "55 Grill Street",
+            "City": "Bangalore",
+            "State": "KA",
+            "PostalCode": "560001",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.3,
+        "ReviewCount": 210,
+        "EstimatedDeliveryTime": 35,
+        "DeliveryFee": 60,
+        "ImageUrl": "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=800"
+    },
+    {
+        "Slug": "italian-garden",
+        "Name": "Italian Garden",
+        "Description": "Handcrafted Pizza and Pasta",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": [
+            "Italian",
+            "Pizza",
+            "Pasta"
+        ],
+        "Address": {
+            "Street": "88 Pizza Blvd",
+            "City": "Bangalore",
+            "State": "KA",
+            "PostalCode": "560001",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.6,
+        "ReviewCount": 145,
+        "EstimatedDeliveryTime": 40,
+        "DeliveryFee": 45,
+        "ImageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800"
+    }
+]

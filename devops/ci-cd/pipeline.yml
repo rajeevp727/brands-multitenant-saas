@@ -1,0 +1,34 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Build
+        run: dotnet build src/backend/MultiTenantSaaS.sln --configuration Release
+      - name: Test
+        run: dotnet test src/backend/MultiTenantSaaS.sln --no-build --verbosity normal
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+        working-directory: src/frontend
+      - name: Build
+        run: npm run build
+        working-directory: src/frontend

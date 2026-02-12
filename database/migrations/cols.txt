@@ -1,0 +1,11 @@
+Changed database context to 'MultiTenantSaaS_DB'.
+COLUMN_NAME                                                                                                                     
+--------------------------------------------------------------------------------------------------------------------------------
+Id                                                                                                                              
+TenantId                                                                                                                        
+OrderId                                                                                                                         
+ProductId                                                                                                                       
+Quantity                                                                                                                        
+UnitPrice                                                                                                                       
+
+(6 rows affected)

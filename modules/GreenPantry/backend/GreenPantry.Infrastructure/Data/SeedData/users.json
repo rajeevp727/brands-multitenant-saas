@@ -1,0 +1,53 @@
+[
+    {
+        "Username": "rajeev",
+        "FirstName": "Rajeev",
+        "LastName": "User",
+        "Email": "rajeev@example.com",
+        "PhoneNumber": "1234567890",
+        "Password": "password123",
+        "Role": 0,
+        "TenantId": "greenpantry",
+        "IsActive": true,
+        "IsEmailVerified": true,
+        "StreetAddress": "123 Green St",
+        "City": "Bangalore",
+        "State": "KA",
+        "PostalCode": "560001",
+        "Country": "India"
+    },
+    {
+        "Username": "admin",
+        "FirstName": "Admin",
+        "LastName": "User",
+        "Email": "admin@example.com",
+        "PhoneNumber": "0987654321",
+        "Password": "admin123",
+        "Role": 1,
+        "TenantId": "greenpantry",
+        "IsActive": true,
+        "IsEmailVerified": true,
+        "StreetAddress": "456 Admin Ave",
+        "City": "Bangalore",
+        "State": "KA",
+        "PostalCode": "560001",
+        "Country": "India"
+    },
+    {
+        "Username": "vendor",
+        "FirstName": "Vendor",
+        "LastName": "User",
+        "Email": "vendor@example.com",
+        "PhoneNumber": "1122334455",
+        "Password": "vendor123",
+        "Role": 2,
+        "TenantId": "greenpantry",
+        "IsActive": true,
+        "IsEmailVerified": true,
+        "StreetAddress": "789 Market Rd",
+        "City": "Bangalore",
+        "State": "KA",
+        "PostalCode": "560001",
+        "Country": "India"
+    }
+]

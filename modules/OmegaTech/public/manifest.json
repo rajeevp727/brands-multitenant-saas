@@ -1,0 +1,34 @@
+{
+  "short_name": "Omega Tech",
+  "name": "Omega Technologies - Enterprise Software Development",
+  "description": "Engineering scalable, secure digital solutions for modern businesses using .NET, React, Cloud, and Automation.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "Template Images/Logo.jpg",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#38f2e6",
+  "background_color": "#0b0f1a",
+  "categories": ["business", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false
+}

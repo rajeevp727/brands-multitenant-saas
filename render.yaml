@@ -1,0 +1,32 @@
+services:
+  # Main SaaS API (dockerContext must be backend dir so COPY paths resolve)
+  - type: web
+    name: saas-api
+    env: docker
+    dockerfilePath: ./src/backend/Dockerfile
+    dockerContext: ./src/backend
+    region: singapore
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false # User must provide this in dashboard
+      - key: FrontendUrl
+        value: https://rajeevstech.in
+      - key: AllowedOrigins
+        value: https://rajeevstech.in,https://rajeevstech.com,https://greenpantry.in
+
+  # GreenPantry API
+  - type: web
+    name: greenpantry-api
+    env: docker
+    dockerfilePath: ./modules/GreenPantry/backend/Dockerfile
+    dockerContext: ./modules/GreenPantry
+    region: singapore
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false # User must provide this in dashboard

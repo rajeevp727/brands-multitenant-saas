@@ -1,0 +1,213 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build_and_deploy_job:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+
+    steps:
+      # 1️⃣ Checkout source code
+      - uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      # 4️⃣ Build React app
+      - name: Build
+        run: npm run build
+
+      # 🔥 FORCE FAILURE — TEST ONLY - COMMENT AFTER TEST 
+      # - name: 🔥 Force Failure (TEST ONLY)
+      #   if: github.ref_name == 'master'
+      #   run: |
+      #     echo "Intentional failure for testing FAILURE notifications"
+      #     exit 1
+
+      # 5️⃣ Deploy to Azure Static Web Apps
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /
+          api_location: ""
+          output_location: build
+
+                # ==================================
+      # ✅ SUCCESS NOTIFICATIONS (PROD ONLY)
+      # ==================================
+      - name: Notify on SUCCESS (WhatsApp + SMS + Email)
+        if: success() && github.ref_name == 'master'
+        shell: bash
+        run: |
+          APP_NAME="Omega Technologies"
+          STATUS="SUCCESS"
+          BRANCH="$GITHUB_REF_NAME"
+          FULL_SHA="$GITHUB_SHA"
+          VERIFY_URL="${{ secrets.VERIFY_URL }}"
+
+          RAW_COMMIT_MSG="$(git log -1 --pretty=%B)"
+          COMMIT_MSG_CLEAN="$(echo "$RAW_COMMIT_MSG" | tr '\n' ' ' | cut -c1-200)"
+
+          echo "Sending PROD SUCCESS notifications..."
+
+          # 📲 WhatsApp (NON-BLOCKING)
+          curl -s -X POST "https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_SID }}/Messages.json" \
+            --data-urlencode "From=${{ secrets.TWILIO_FROM }}" \
+            --data-urlencode "To=${{ secrets.WHATSAPP_TO }}" \
+            --data-urlencode "ContentSid=${{ secrets.WHATSAPP_TEMPLATE_SID }}" \
+            --data-urlencode "ContentVariables={\"1\":\"$STATUS\",\"2\":\"$BRANCH\",\"3\":\"$FULL_SHA\",\"4\":\"$COMMIT_MSG_CLEAN\",\"5\":\"$VERIFY_URL\"}" \
+            -u "${{ secrets.TWILIO_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}" \
+            || echo "WhatsApp failed (ignored)"
+
+          # 📩 SMS (NON-BLOCKING)
+          curl -s -X POST "https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_SID }}/Messages.json" \
+            --data-urlencode "From=${{ secrets.TWILIO_SMS_FROM }}" \
+            --data-urlencode "To=${{ secrets.SMS_TO }}" \
+            --data-urlencode "Body=✅ PROD Deployment SUCCESS
+          App: $APP_NAME
+          Branch: $BRANCH
+          Commit: $FULL_SHA
+
+          Message:
+          $COMMIT_MSG_CLEAN
+
+          URL:
+          $VERIFY_URL" \
+                      -u "${{ secrets.TWILIO_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}" \
+                      || echo "SMS failed (ignored)"
+
+          # 📧 EMAIL (ALWAYS SENT)
+          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
+            -H "Authorization: Bearer ${{ secrets.SENDGRID_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg to "${{ secrets.EMAIL_TO }}" \
+              --arg from "${{ secrets.EMAIL_FROM }}" \
+              --arg app "$APP_NAME" \
+              --arg branch "$BRANCH" \
+              --arg sha "$FULL_SHA" \
+              --arg commit "$COMMIT_MSG_CLEAN" \
+              --arg url "$VERIFY_URL" \
+              --arg run "${{ github.run_number }}" \
+              '{
+                personalizations: [{
+                  to: [{ email: $to }]
+                }],
+                from: { email: $from, name: "Omega CI/CD" },
+                subject: ("✅ PROD Deployment SUCCESS – Omega Technologies – Deployment #" + $run),
+                content: [{
+                  type: "text/html",
+                  value: "<div style=\"font-family:Arial,sans-serif\">
+                    <h2 style=\"color:#16a34a\">✅ PROD Deployment Successful</h2>
+                    <hr/>
+                    <p><b>App:</b> \($app)</p>
+                    <p><b>Branch:</b> \($branch)</p>
+                    <p><b>Commit SHA:</b><br/><code>\($sha)</code></p>
+                    <p><b>Commit Message:</b><br/>\($commit)</p>
+                    <p><b>Verify your deployments at:</b><br/>
+                      <a href=\"\($url)\">\($url)</a>
+                    </p>
+                    <p style=\"font-size:12px;color:#6b7280\">
+                      Automated PROD notification – Omega CI/CD
+                    </p>
+                  </div>"
+                }]
+              }')"
+
+
+      # ==================================
+      # ❌ FAILURE NOTIFICATIONS (PROD ONLY)
+      # ==================================
+      - name: Notify on FAILURE (WhatsApp + SMS + Email)
+        if: failure() && github.ref_name == 'master'
+        shell: bash
+        run: |
+          APP_NAME="Omega Technologies"
+          STATUS="FAILED"
+          BRANCH="$GITHUB_REF_NAME"
+          FULL_SHA="$GITHUB_SHA"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          RAW_COMMIT_MSG="$(git log -1 --pretty=%B)"
+          COMMIT_MSG_CLEAN="$(echo "$RAW_COMMIT_MSG" | tr '\n' ' ' | cut -c1-200)"
+
+          echo "Sending PROD FAILURE notifications..."
+
+          # 📲 WhatsApp (NON-BLOCKING)
+          curl -s -X POST "https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_SID }}/Messages.json" \
+            --data-urlencode "From=${{ secrets.TWILIO_FROM }}" \
+            --data-urlencode "To=${{ secrets.WHATSAPP_TO }}" \
+            --data-urlencode "ContentSid=${{ secrets.WHATSAPP_TEMPLATE_SID }}" \
+            --data-urlencode "ContentVariables={\"1\":\"$STATUS\",\"2\":\"$BRANCH\",\"3\":\"$FULL_SHA\",\"4\":\"$COMMIT_MSG_CLEAN\",\"5\":\"$RUN_URL\"}" \
+            -u "${{ secrets.TWILIO_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}" \
+            || echo "WhatsApp failed (ignored)"
+
+          # 📩 SMS (NON-BLOCKING)
+          curl -s -X POST "https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_SID }}/Messages.json" \
+            --data-urlencode "From=${{ secrets.TWILIO_SMS_FROM }}" \
+            --data-urlencode "To=${{ secrets.SMS_TO }}" \
+            --data-urlencode "Body=🚨 PROD Deployment FAILED
+          App: $APP_NAME
+          Branch: $BRANCH
+          Commit: $FULL_SHA
+
+          Message:
+          $COMMIT_MSG_CLEAN
+
+          Logs:
+          $RUN_URL" \
+                      -u "${{ secrets.TWILIO_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}" \
+                      || echo "SMS failed (ignored)"
+
+          # 📧 EMAIL (ALWAYS SENT)
+          curl -s -X POST "https://api.sendgrid.com/v3/mail/send" \
+            -H "Authorization: Bearer ${{ secrets.SENDGRID_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg to "${{ secrets.EMAIL_TO }}" \
+              --arg from "${{ secrets.EMAIL_FROM }}" \
+              --arg app "$APP_NAME" \
+              --arg branch "$BRANCH" \
+              --arg sha "$FULL_SHA" \
+              --arg commit "$COMMIT_MSG_CLEAN" \
+              --arg run "${{ github.run_number }}" \
+              --arg url "$RUN_URL" \
+              '{
+                personalizations: [{
+                  to: [{ email: $to }]
+                }],
+                from: { email: $from, name: "Omega CI/CD" },
+                subject: ("🚨 PROD Deployment FAILED – Omega Technologies – Deployment #" + $run),
+                content: [{
+                  type: "text/html",
+                  value: "<div style=\"font-family:Arial,sans-serif\">
+                    <h2 style=\"color:#dc2626\">🚨 PROD Deployment Failed</h2>
+                    <hr/>
+                    <p><b>App:</b> \($app)</p>
+                    <p><b>Branch:</b> \($branch)</p>
+                    <p><b>Commit SHA:</b><br/><code>\($sha)</code></p>
+                    <p><b>Commit Message:</b><br/>\($commit)</p>
+                    <p><b>Logs:</b><br/>
+                      <a href=\"\($url)\">\($url)</a>
+                    </p>
+                    <p style=\"font-size:12px;color:#6b7280\">
+                      Immediate action required – PROD alert
+                    </p>
+                  </div>"
+                }]
+              }')"

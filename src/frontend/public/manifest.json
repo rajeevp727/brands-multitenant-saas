@@ -1,0 +1,28 @@
+{
+    "name": "Rajeev's Pvt. Ltd.",
+    "short_name": "Rajeev's Tech",
+    "description": "Multi-tenant business management ecosystem.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1976d2",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/images/RajeevsTech.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/RajeevsTech.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/RajeevsTech.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+[
+    {
+        "Id": "rajeev-pvt",
+        "Name": "Rajeev's Pvt. Ltd.",
+        "Identifier": "admin",
+        "IsActive": true
+    },
+    {
+        "Id": "greenpantry",
+        "Name": "GreenPantry",
+        "Identifier": "greenpantry",
+        "IsActive": true
+    },
+    {
+        "Id": "omega",
+        "Name": "Omega Technologies",
+        "Identifier": "omega",
+        "IsActive": true
+    },
+    {
+        "Id": "bangaru",
+        "Name": "BangaruKottu",
+        "Identifier": "bangaru",
+        "IsActive": true
+    },
+    {
+        "Id": "vanavajram",
+        "Name": "vanaVajram",
+        "Identifier": "vanavajram",
+        "IsActive": true
+    },
+    {
+        "Id": "vajravalli",
+        "Name": "vajraValli",
+        "Identifier": "vajravalli",
+        "IsActive": true
+    },
+    {
+        "Id": "morebrands",
+        "Name": "More Brands",
+        "Identifier": "morebrands",
+        "IsActive": true
+    }
+]

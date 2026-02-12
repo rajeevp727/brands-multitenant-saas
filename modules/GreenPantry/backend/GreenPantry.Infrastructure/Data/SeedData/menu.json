@@ -1,0 +1,149 @@
+[
+    {
+        "RestaurantSlug": "green-pantry-kitchen",
+        "Items": [
+            {
+                "Name": "Quinoa Salad",
+                "Description": "Fresh quinoa with mixed veggies",
+                "Price": 250.00,
+                "Category": "Salad",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800"
+            },
+            {
+                "Name": "Avocado Toast",
+                "Description": "Sourdough toast with avocado mash",
+                "Price": 180.00,
+                "Category": "Breakfast",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800"
+            },
+            {
+                "Name": "Green Smoothie",
+                "Description": "Spinach, apple, and banana",
+                "Price": 150.00,
+                "Category": "Beverages",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1544054468-b7d2f414cb53?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "spice-village",
+        "Items": [
+            {
+                "Name": "Paneer Butter Masala",
+                "Description": "Creamy tomato based paneer curry",
+                "Price": 320.00,
+                "Category": "Main Course",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800"
+            },
+            {
+                "Name": "Tandoori Roti",
+                "Description": "Whole wheat clay oven bread",
+                "Price": 40.00,
+                "Category": "Breads",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=800"
+            },
+            {
+                "Name": "Dal Makhani",
+                "Description": "Slow cooked black lentils",
+                "Price": 280.00,
+                "Category": "Main Course",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "healthy-bowls",
+        "Items": [
+            {
+                "Name": "Buddha Bowl",
+                "Description": "Chickpeas, kale, sweet potato, and tahini",
+                "Price": 290.00,
+                "Category": "Bowls",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800"
+            },
+            {
+                "Name": "Poke Bowl",
+                "Description": "Tofu, edamame, cucumber, and rice",
+                "Price": 350.00,
+                "Category": "Bowls",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "burger-house",
+        "Items": [
+            {
+                "Name": "Classic Beef Burger",
+                "Description": "Juicy beef patty with lettuce and cheese",
+                "Price": 220.00,
+                "Category": "Burgers",
+                "IsVegetarian": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800"
+            },
+            {
+                "Name": "Veggie Delight Burger",
+                "Description": "Mixed veg patty with spicy mayo",
+                "Price": 180.00,
+                "Category": "Burgers",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=800"
+            },
+            {
+                "Name": "French Fries",
+                "Description": "Crispy golden salted fries",
+                "Price": 120.00,
+                "Category": "Sides",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "italian-garden",
+        "Items": [
+            {
+                "Name": "Margherita Pizza",
+                "Description": "Classic tomato, mozzarella, and basil",
+                "Price": 350.00,
+                "Category": "Pizza",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?w=800"
+            },
+            {
+                "Name": "Penne Arrabbiata",
+                "Description": "Spicy tomato sauce with penne",
+                "Price": 280.00,
+                "Category": "Pasta",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800"
+            }
+        ]
+    }
+]

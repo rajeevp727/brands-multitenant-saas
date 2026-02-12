@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore src/backend/MultiTenantSaaS.sln
+
+    - name: Build
+      run: dotnet build src/backend/MultiTenantSaaS.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test src/backend/MultiTenantSaaS.sln --configuration Release --no-build --verbosity normal
+
+  deploy:
+    needs: build-and-test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t saas-api:${{ github.sha }} -f src/backend/Dockerfile src/backend
+        # In a real scenario, push to AWS ECR, Azure ACR, or Docker Hub
+        # docker tag saas-api:${{ github.sha }} yourregistry.azurecr.io/saas-api:latest
+        # docker push yourregistry.azurecr.io/saas-api:latest

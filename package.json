@@ -1,0 +1,27 @@
+{
+    "name": "multitenant-saas-root",
+    "version": "1.0.0",
+    "description": "Root management for Multi-Tenant SaaS Ecosystem",
+    "private": true,
+    "scripts": {
+        "prestart": "node scripts/stop-services.js",
+        "start": "concurrently -n \"API,UI\" -c \"blue,green\" \"npm run start:apis\" \"npm run start:ui:saas\"",
+        "start:all": "concurrently -n \"APIs,UIs\" -c \"blue,green\" \"npm run start:apis\" \"npm run start:uis\"",
+        "start:apis": "concurrently -n \"SAAS-API,GP-API,BK-API\" -c \"blue.bold,cyan.bold,yellow.bold\" \"npm run start:api:saas\" \"dotnet run --project modules/GreenPantry/backend/GreenPantry.API/GreenPantry.API.csproj --urls http://0.0.0.0:7001\" \"dotnet run --project modules/BangaruKottu/backend/Vendor.API/Vendor.API.csproj --urls http://0.0.0.0:7002\"",
+        "start:api:saas": "dotnet run --project src/backend/SaaS.Api/SaaS.Api.csproj --urls http://0.0.0.0:5114",
+        "start:uis": "concurrently -n \"SaaS-UI,GP-UI,OMEGA,BK-UI\" -c \"bgGreen,bgMagenta,bgYellow,bgWhite\" \"npm run start:ui:saas\" \"npm run start:ui:greenpantry\" \"npm run start:ui:omegatech\" \"npm run start:ui:bangaru\"",
+        "start:ui:saas": "wait-on http-get://127.0.0.1:5114/health && cd src/frontend && npm run dev -- --port 5173 --open",
+        "start:ui:greenpantry": "wait-on http-get://localhost:7001/health && cd modules/GreenPantry/frontend && npm run dev -- --port 5174",
+        "start:ui:omegatech": "wait-on http-get://localhost:5114/health && cd modules/OmegaTech && npm start",
+        "start:ui:bangaru": "wait-on http-get://localhost:7002/health && cd modules/BangaruKottu/frontend && npm run dev -- --port 5176",
+        "dev": "npm start",
+        "stop": "node scripts/stop-services.js",
+        "build": "npm run build --prefix src/frontend",
+        "postinstall": "npm install --prefix src/frontend",
+        "install-all": "npm install --prefix src/frontend && npm install --prefix modules/GreenPantry/frontend && npm install --prefix modules/BangaruKottu/frontend && npm install --prefix modules/OmegaTech"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1",
+        "wait-on": "^9.0.3"
+    }
+}
