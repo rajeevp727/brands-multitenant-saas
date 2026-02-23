@@ -1,28 +1,16 @@
-using SaaS.Application;
-using SaaS.Infrastructure;
-using SaaS.Application.Interfaces;
-using SaaS.Infrastructure.Services;
-using SaaS.Api.Services;
+using Microsoft.AspNetCore.RateLimiting;
+using SaaS.Api.Core.Tenancy;
 using SaaS.Api.Middleware;
-using SaaS.Shared.Extensions;
+using SaaS.Api.Services;
+using SaaS.Application;
+using SaaS.Application.Interfaces;
 using SaaS.Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using SaaS.Infrastructure;
+using SaaS.Infrastructure.Repositories;
+using SaaS.Infrastructure.Services;
+using SaaS.Shared.Extensions;
 using Serilog;
 using Serilog.Events;
-using Serilog.Filters;
-using Serilog.Expressions;
-using System.Net;
-using System.Net.Http;
-using System.Net.Sockets;
-using SaaS.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.RateLimiting;
-using OpenTelemetry.Trace;
-using OpenTelemetry.Metrics;
-using Serilog.AspNetCore;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +40,9 @@ builder.Services.AddSaaSCors(builder.Configuration, "TenantPolicy");
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantProvider, HttpContextTenantProvider>();
+builder.Services.AddScoped<TenantContext>();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ITenantService, TenantService>();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

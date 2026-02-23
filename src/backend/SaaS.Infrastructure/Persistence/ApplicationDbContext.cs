@@ -1,19 +1,23 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SaaS.Domain.Common;
 using SaaS.Domain.Entities;
 using SaaS.Domain.Interfaces;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SaaS.Infrastructure.Persistence;
 
 public class ApplicationDbContext : DbContext
 {
     private readonly ITenantProvider _tenantProvider;
+    private readonly IUserContext _userContext;
     public string? CurrentTenantId => _tenantProvider.GetTenantId();
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantProvider tenantProvider)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantProvider tenantProvider, IUserContext userContext)
         : base(options)
     {
         _tenantProvider = tenantProvider;
+        _userContext = userContext;
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -50,7 +54,11 @@ public class ApplicationDbContext : DbContext
         // Indexing Strategy: Every tenant-specific table should have an index on TenantId
         modelBuilder.Entity<Brand>().HasIndex(b => b.TenantId);
         modelBuilder.Entity<Product>().HasIndex(p => p.TenantId);
-        modelBuilder.Entity<Order>().HasIndex(o => o.TenantId);
+        modelBuilder.Entity<Order>().HasIndex(o => new { o.TenantId, o.CreatedAt });
+        modelBuilder.Entity<Product>().HasIndex(p => new { p.TenantId, p.Name });
+        modelBuilder.Entity<User>().HasIndex(u => new { u.TenantId, u.RoleId });
+        modelBuilder.Entity<Notification>()
+            .HasIndex(n => new { n.TenantId, n.IsRead });
         modelBuilder.Entity<Notification>().HasIndex(n => n.TenantId);
         modelBuilder.Entity<Role>().HasIndex(r => r.TenantId);
 
@@ -58,7 +66,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => new { u.Email, u.TenantId })
             .IsUnique();
-        
+
         // Optimize lookup for Username per Tenant
         modelBuilder.Entity<User>()
             .HasIndex(u => new { u.Username, u.TenantId })
@@ -77,55 +85,129 @@ public class ApplicationDbContext : DbContext
         }
     }
 
-    private System.Linq.Expressions.LambdaExpression CreateTenantFilterExpression(Type type)
+    private LambdaExpression CreateTenantFilterExpression(Type type)
     {
-        var parameter = System.Linq.Expressions.Expression.Parameter(type, "e");
-        var property = System.Linq.Expressions.Expression.Property(parameter, nameof(ITenantEntity.TenantId));
-        
-        var dbContext = System.Linq.Expressions.Expression.Constant(this);
-        var currentTenantIdProperty = typeof(ApplicationDbContext).GetProperty(nameof(CurrentTenantId));
-        var tenantIdCall = System.Linq.Expressions.Expression.Property(dbContext, currentTenantIdProperty!);
-        
-        var tenantCheck = System.Linq.Expressions.Expression.Equal(property, tenantIdCall);
-        return System.Linq.Expressions.Expression.Lambda(tenantCheck, parameter);
+        var parameter = Expression.Parameter(type, "e");
+
+        var tenantProperty = Expression.Call(
+            typeof(EF),
+            nameof(EF.Property),
+            new[] { typeof(string) },
+            parameter,
+            Expression.Constant(nameof(ITenantEntity.TenantId)));
+
+        var tenantId = Expression.Property(
+            Expression.Constant(this),
+            nameof(CurrentTenantId));
+
+        var body = Expression.Equal(tenantProperty, tenantId);
+
+        return Expression.Lambda(body, parameter);
+    }
+
+    private string GetCurrentTenantId()
+    {
+        return _tenantProvider.GetTenantId()!;
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var tenantId = _tenantProvider.GetTenantId();
-        var auditEntries = OnBeforeSaveChanges(tenantId);
 
+        if (string.IsNullOrWhiteSpace(tenantId))
+            throw new Exception("Tenant context missing. Middleware not executed.");
+
+        // -----------------------------
+        // HARD TENANT SECURITY ENFORCEMENT
+        // -----------------------------
         foreach (var entry in ChangeTracker.Entries<ITenantEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    if (string.IsNullOrEmpty(entry.Entity.TenantId))
-                    {
-                        entry.Entity.TenantId = tenantId ?? throw new Exception("TenantId is required for new entities.");
-                    }
+                    // Always overwrite tenant coming from API payload
+                    entry.Entity.TenantId = tenantId;
                     break;
-            }
-        }
 
-        foreach (var entry in ChangeTracker.Entries<AuditableEntity<Guid>>())
-        {
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
-                    break;
                 case EntityState.Modified:
-                    entry.Entity.LastModifiedAt = DateTime.UtcNow;
+                    // Prevent tenant switching attack
+                    entry.Property(nameof(ITenantEntity.TenantId)).IsModified = false;
+                    break;
+
+                case EntityState.Deleted:
+                    // Prevent deleting another tenant's record
+                    if (entry.Entity.TenantId != tenantId)
+                        throw new UnauthorizedAccessException("Cross-tenant delete attempt blocked.");
                     break;
             }
         }
 
-        var result = await base.SaveChangesAsync(cancellationToken);
-        await OnAfterSaveChanges(auditEntries, cancellationToken);
-        return result;
-    }
+        // -----------------------------
+        // AUDIT CREATION (BEFORE SAVE → single DB transaction)
+        // -----------------------------
+        ChangeTracker.DetectChanges();
 
+        var auditEntries = new List<AuditEntry>();
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is AuditLog ||
+                entry.State == EntityState.Detached ||
+                entry.State == EntityState.Unchanged)
+                continue;
+
+            var auditEntry = new AuditEntry(entry)
+            {
+                TenantId = tenantId,
+                UserId = _userContext.UserId ?? "System",
+                EntityName = entry.Entity.GetType().Name
+            };
+
+            auditEntries.Add(auditEntry);
+
+            foreach (var property in entry.Properties)
+            {
+                var propertyName = property.Metadata.Name;
+
+                if (property.Metadata.IsPrimaryKey())
+                {
+                    auditEntry.KeyValues[propertyName] = property.CurrentValue;
+                    continue;
+                }
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        auditEntry.AuditType = "Create";
+                        auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        break;
+
+                    case EntityState.Deleted:
+                        auditEntry.AuditType = "Delete";
+                        auditEntry.OldValues[propertyName] = property.OriginalValue;
+                        break;
+
+                    case EntityState.Modified:
+                        if (property.IsModified)
+                        {
+                            auditEntry.AuditType = "Update";
+                            auditEntry.OldValues[propertyName] = property.OriginalValue;
+                            auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        }
+                        break;
+                }
+            }
+        }
+
+        // Attach audit logs BEFORE save (same transaction)
+        foreach (var auditEntry in auditEntries)
+            AuditLogs.Add(auditEntry.ToAudit());
+
+        // -----------------------------
+        // SINGLE DATABASE COMMIT
+        // -----------------------------
+        return await base.SaveChangesAsync(cancellationToken);
+    }
     private List<AuditEntry> OnBeforeSaveChanges(string? tenantId)
     {
         ChangeTracker.DetectChanges();
@@ -138,7 +220,7 @@ public class ApplicationDbContext : DbContext
             var auditEntry = new AuditEntry(entry)
             {
                 TenantId = tenantId ?? "Global",
-                UserId = CurrentTenantId ?? "System", // Fallback to tenantId if userId not easily accessible here
+                UserId = _userContext.UserId ?? "System",
                 EntityName = entry.Entity.GetType().Name
             };
             auditEntries.Add(auditEntry);
@@ -177,17 +259,13 @@ public class ApplicationDbContext : DbContext
         }
         return auditEntries;
     }
-
-    private Task OnAfterSaveChanges(List<AuditEntry> auditEntries, CancellationToken cancellationToken)
+    private string? GetTenantIdOrNull()
     {
-        if (auditEntries == null || auditEntries.Count == 0)
-            return Task.CompletedTask;
-
-        foreach (var auditEntry in auditEntries)
-        {
-            AuditLogs.Add(auditEntry.ToAudit());
-        }
-        return base.SaveChangesAsync(cancellationToken);
+        return _tenantProvider.GetTenantId();
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.EnableThreadSafetyChecks(false);
     }
 }
 
