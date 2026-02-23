@@ -73,7 +73,8 @@ public class ApplicationDbContext : DbContext
             .IsUnique();
 
         // Custom filter for AppConstant (Global or Tenant Specific)
-        modelBuilder.Entity<AppConstant>().HasQueryFilter(e => e.TenantId == CurrentTenantId || e.TenantId == null);
+        modelBuilder.Entity<AppConstant>()
+    .HasQueryFilter(e => e.TenantId == GetCurrentTenantId() || e.TenantId == null);
 
         // Apply Global Query Filter for Multi-Tenancy
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -96,11 +97,12 @@ public class ApplicationDbContext : DbContext
             parameter,
             Expression.Constant(nameof(ITenantEntity.TenantId)));
 
-        var tenantId = Expression.Property(
-            Expression.Constant(this),
-            nameof(CurrentTenantId));
+        var getTenantMethod = typeof(ApplicationDbContext)
+            .GetMethod(nameof(GetCurrentTenantId), BindingFlags.Instance | BindingFlags.NonPublic)!;
 
-        var body = Expression.Equal(tenantProperty, tenantId);
+        var tenantIdCall = Expression.Call(Expression.Constant(this), getTenantMethod);
+
+        var body = Expression.Equal(tenantProperty, tenantIdCall);
 
         return Expression.Lambda(body, parameter);
     }
@@ -207,61 +209,6 @@ public class ApplicationDbContext : DbContext
         // SINGLE DATABASE COMMIT
         // -----------------------------
         return await base.SaveChangesAsync(cancellationToken);
-    }
-    private List<AuditEntry> OnBeforeSaveChanges(string? tenantId)
-    {
-        ChangeTracker.DetectChanges();
-        var auditEntries = new List<AuditEntry>();
-        foreach (var entry in ChangeTracker.Entries())
-        {
-            if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
-                continue;
-
-            var auditEntry = new AuditEntry(entry)
-            {
-                TenantId = tenantId ?? "Global",
-                UserId = _userContext.UserId ?? "System",
-                EntityName = entry.Entity.GetType().Name
-            };
-            auditEntries.Add(auditEntry);
-
-            foreach (var property in entry.Properties)
-            {
-                string propertyName = property.Metadata.Name;
-                if (property.Metadata.IsPrimaryKey())
-                {
-                    auditEntry.KeyValues[propertyName] = property.CurrentValue;
-                    continue;
-                }
-
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        auditEntry.AuditType = "Create";
-                        auditEntry.NewValues[propertyName] = property.CurrentValue;
-                        break;
-
-                    case EntityState.Deleted:
-                        auditEntry.AuditType = "Delete";
-                        auditEntry.OldValues[propertyName] = property.OriginalValue;
-                        break;
-
-                    case EntityState.Modified:
-                        if (property.IsModified)
-                        {
-                            auditEntry.AuditType = "Update";
-                            auditEntry.OldValues[propertyName] = property.OriginalValue;
-                            auditEntry.NewValues[propertyName] = property.CurrentValue;
-                        }
-                        break;
-                }
-            }
-        }
-        return auditEntries;
-    }
-    private string? GetTenantIdOrNull()
-    {
-        return _tenantProvider.GetTenantId();
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
