@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using SaaS.Api.Core.Tenancy;
 using SaaS.Api.Middleware;
 using SaaS.Api.Services;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ITenantProvider, HttpContextTenantProvider>();
 builder.Services.AddScoped<TenantContext>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -82,20 +84,19 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // DEBUG: Dump Users table columns to identify where "Password" column came from
-    try {
-        using var scope = app.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<SaaS.Infrastructure.Persistence.ApplicationDbContext>();
-        // Using ADO.NET because SqlQueryRaw is for entities
-        using var conn = context.Database.GetDbConnection();
-        await conn.OpenAsync();
-        using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Users' AND table_schema = 'public'";
-        var columns = new List<string>();
-        using var reader = await cmd.ExecuteReaderAsync();
-        while (await reader.ReadAsync()) columns.Add(reader.GetString(0));
-        Console.WriteLine("DEBUG SCHEMA [public.Users]: " + string.Join(", ", columns));
-    } catch (Exception ex) { Console.WriteLine("DEBUG SCHEMA ERROR: " + ex.Message); }
+    // DEBUG: Dump Users table columns - TEMPORARILY DISABLED (was hanging on DB connection)
+    // try {
+    //     using var scope = app.Services.CreateScope();
+    //     var context = scope.ServiceProvider.GetRequiredService<SaaS.Infrastructure.Persistence.ApplicationDbContext>();
+    //     using var conn = context.Database.GetDbConnection();
+    //     await conn.OpenAsync();
+    //     using var cmd = conn.CreateCommand();
+    //     cmd.CommandText = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Users' AND table_schema = 'public'";
+    //     var columns = new List<string>();
+    //     using var reader = await cmd.ExecuteReaderAsync();
+    //     while (await reader.ReadAsync()) columns.Add(reader.GetString(0));
+    //     Console.WriteLine("DEBUG SCHEMA [public.Users]: " + string.Join(", ", columns));
+    // } catch (Exception ex) { Console.WriteLine("DEBUG SCHEMA ERROR: " + ex.Message); }
 
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -128,7 +129,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Serilog.Log.Error(ex, "An error occurred during database seeding.");
+        Serilog.Log.Error(ex, "An error occurred during database seeding. App will continue.");
     }
 }
 

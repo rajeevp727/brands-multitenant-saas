@@ -8,6 +8,7 @@ export interface User {
     role?: string;
     name?: string;
     avatarUrl?: string;
+    token?: string; // Add token to User
 }
 
 export interface LoginRequest {
@@ -24,6 +25,8 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
     user: User;
+    token?: string; // Add token to response
+    refreshToken?: string; // Add refreshToken
 }
 
 class AuthService {
@@ -39,6 +42,10 @@ class AuthService {
 
     setCurrentUser(user: User): void {
         localStorage.setItem('saas_user_data', JSON.stringify(user));
+        // Also store token if present
+        if (user.token) {
+            localStorage.setItem('access_token', user.token);
+        }
     }
 
     removeCurrentUser(): void {
@@ -48,17 +55,36 @@ class AuthService {
     }
 
     async login(credentials: LoginRequest): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/auth/login', credentials);
-        const { user } = response.data;
-        this.setCurrentUser(user);
-        return { user };
+        const response = await api.post<any>('/auth/login', credentials);
+        const { user, token, refreshToken } = response.data;
+        
+        // Store token with user data
+        const userWithToken = { ...user, token };
+        this.setCurrentUser(userWithToken);
+        
+        // Also store in 'user' key for interceptor compatibility
+        localStorage.setItem('user', JSON.stringify({ token, user }));
+        
+        if (refreshToken) {
+            localStorage.setItem('refresh_token', refreshToken);
+        }
+        
+        return { user: userWithToken, token, refreshToken };
     }
 
     async register(data: RegisterRequest): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/auth/register', data);
-        const { user } = response.data;
-        this.setCurrentUser(user);
-        return { user };
+        const response = await api.post<any>('/auth/register', data);
+        const { user, token, refreshToken } = response.data;
+        
+        const userWithToken = { ...user, token };
+        this.setCurrentUser(userWithToken);
+        localStorage.setItem('user', JSON.stringify({ token, user }));
+        
+        if (refreshToken) {
+            localStorage.setItem('refresh_token', refreshToken);
+        }
+        
+        return { user: userWithToken, token, refreshToken };
     }
 
     async logout(): Promise<void> {

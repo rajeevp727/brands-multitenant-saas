@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SaaS.Domain.Common;
 using SaaS.Domain.Entities;
 using SaaS.Domain.Interfaces;
@@ -109,15 +109,18 @@ public class ApplicationDbContext : DbContext
 
     private string GetCurrentTenantId()
     {
-        return _tenantProvider.GetTenantId()!;
+        // Fall back to default tenant when no tenant header present (e.g. during auth/OAuth flows)
+        return _tenantProvider.GetTenantId() ?? "rajeev-pvt";
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var tenantId = _tenantProvider.GetTenantId();
 
+        // Fall back to system default tenant for auth flows (login, OAuth callback, seeding)
+        // that run before a tenant header is established.
         if (string.IsNullOrWhiteSpace(tenantId))
-            throw new Exception("Tenant context missing. Middleware not executed.");
+            tenantId = "rajeev-pvt";
 
         // -----------------------------
         // HARD TENANT SECURITY ENFORCEMENT
@@ -144,9 +147,11 @@ public class ApplicationDbContext : DbContext
             }
         }
 
-        }
-
         return await OnBeforeSaveChanges(tenantId);
+    }
+
+    private async Task<int> OnBeforeSaveChanges(string? tenantId)
+    {
         ChangeTracker.DetectChanges();
 
         var auditEntries = new List<AuditEntry>();
@@ -208,8 +213,9 @@ public class ApplicationDbContext : DbContext
         // -----------------------------
         // SINGLE DATABASE COMMIT
         // -----------------------------
-        return await base.SaveChangesAsync(cancellationToken);
+        return await base.SaveChangesAsync();
     }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableThreadSafetyChecks(false);

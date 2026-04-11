@@ -1,4 +1,5 @@
 ﻿using SaaS.Api.Core.Tenancy;
+using SaaS.Infrastructure.Repositories;
 
 namespace SaaS.Api.Middleware
 {
@@ -25,10 +26,10 @@ namespace SaaS.Api.Middleware
                 return;
             }
 
-            tenantContext.TenantId = tenant.Id;
+            tenantContext.TenantId = Guid.Parse(tenant.Id);
             tenantContext.Name = tenant.Name;
-            tenantContext.Domain = tenant.Domain;
-            tenantContext.ConnectionString = tenant.ConnectionString;
+            tenantContext.Domain = tenant.Hostname;
+            tenantContext.ConnectionString = ""; // TODO: Add connection string logic if needed
 
             context.Items["Tenant"] = tenantContext;
 

@@ -49,9 +49,13 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response?.status === 401) {
             const currentPath = window.location.pathname;
+            const requestUrl = (error.config?.url ?? "");
+
+            // /auth/me is called on page load to check session — 401 is expected when not logged in
+            const isSilentCheck = requestUrl.includes("/auth/me");
 
             // Prevent infinite redirect loop
-            if (currentPath !== "/login") {
+            if (currentPath !== "/login" && !isSilentCheck) {
                 console.warn("Unauthorized - redirecting to login");
 
                 localStorage.removeItem("user");

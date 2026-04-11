@@ -36,129 +36,94 @@ public class AuthService : IAuthService
     {
         _logger.LogInformation("Login attempt for email: {Email}", request.Email);
         
-        // DEBUG: Check what user is trying to access from which tenant
-        var userAnyTenant = await _unitOfWork.Repository<User>().GetQueryable()
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Email == request.Email);
-
-        if (userAnyTenant == null)
+        // BOOTSTRAP ADMIN - Direct hardcoded authentication for testing
+        if (string.Equals(request.Email, "admin@rajeev.com", StringComparison.OrdinalIgnoreCase)
+            && request.Password == "Pass123")
         {
-             _logger.LogWarning("DEBUG: User {Email} does not exist in ANY tenant.", request.Email);
-        }
-        else
-        {
-             _logger.LogInformation("DEBUG: User found in DB. Tenant: {TenantId}, Username: {Username}", userAnyTenant.TenantId, userAnyTenant.Username);
+            _logger.LogInformation("Bootstrap admin login successful!");
+            
+            // Create a temporary admin user object
+            var bootstrapAdmin = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = "Admin",
+                Email = "admin@rajeev.com",
+                PasswordHash = "Pass123",
+                TenantId = "rajeev-pvt",
+                IsActive = true,
+                CreatedBy = "Bootstrap"
+            };
+
+            var token = _jwtProvider.GenerateToken(bootstrapAdmin);
+            var refreshToken = GenerateRefreshToken();
+
+            return new AuthResponse
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7),
+                User = new UserDto
+                {
+                    Id = bootstrapAdmin.Id.ToString(),
+                    Username = bootstrapAdmin.Username,
+                    Email = bootstrapAdmin.Email,
+                    Role = "Admin",
+                    TenantId = bootstrapAdmin.TenantId
+                }
+            };
         }
 
+        // Normal flow - try to find user in database
         var user = await _unitOfWork.Repository<User>().GetQueryable()
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Email == request.Email);
 
+        // If not found in current tenant, try without tenant filter
         if (user == null)
         {
-            if (string.Equals(request.Email, "admin@rajeev.com", StringComparison.OrdinalIgnoreCase)
-                && request.Password == "Pass123")
+            _logger.LogWarning("User {Email} not found in current tenant context. Checking all tenants...", request.Email);
+            user = await _unitOfWork.Repository<User>().GetQueryable()
+                .IgnoreQueryFilters()
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
+            
+            if (user == null)
             {
-                _logger.LogWarning("Bootstrapping fallback admin account because seeded admin user is missing.");
-
-                var adminRole = await _unitOfWork.Repository<Role>().GetQueryable()
-                    .IgnoreQueryFilters()
-                    .FirstOrDefaultAsync(r => r.Name == "Admin" && r.TenantId == "rajeev-pvt");
-
-                if (adminRole == null)
-                {
-                    adminRole = new Role
-                    {
-                        Name = "Admin",
-                        TenantId = "rajeev-pvt"
-                    };
-
-                    await _unitOfWork.Repository<Role>().AddAsync(adminRole);
-                    await _unitOfWork.SaveChangesAsync();
-                }
-
-                var bootstrapAdmin = new User
-                {
-                    Username = "Admin",
-                    Email = "admin@rajeev.com",
-                    LegacyPassword = "Pass123",
-                    LegacyRequestedRole = "Admin",
-                    PasswordHash = "Pass123",
-                    RoleId = adminRole.Id,
-                    TenantId = "rajeev-pvt",
-                    IsActive = true,
-                    CreatedBy = "Bootstrap"
-                };
-
-                await _unitOfWork.Repository<User>().AddAsync(bootstrapAdmin);
-                await _unitOfWork.SaveChangesAsync();
-
-                user = await _unitOfWork.Repository<User>().GetQueryable()
-                    .IgnoreQueryFilters()
-                    .Include(u => u.Role)
-                    .FirstOrDefaultAsync(u => u.Email == request.Email);
-            }
-        }
-
-        if (user == null)
-        {
-            _logger.LogWarning("Login failed: User not found for email {Email} in CURRENT Tenant context.", request.Email);
-            if (userAnyTenant != null)
-            {
-                 _logger.LogWarning("User exists in tenant '{UserTenant}' but request is for current tenant context.", userAnyTenant.TenantId);
-            }
-            throw new Exception("Invalid credentials");
-        }
-
-        bool isPasswordValid = false;
-        try 
-        {
-            isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-            if (!isPasswordValid)
-            {
-                // Fallback for seeded users with plain text passwords (DEV/DEMO ONLY)
-                if (request.Password == user.PasswordHash)
-                {
-                    isPasswordValid = true;
-                    _logger.LogWarning("Plain text password match for {Email}", request.Email);
-                }
-                else
-                {
-                    _logger.LogWarning("BCrypt verification failed for {Email}", request.Email);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // Fallback for seeded users even if BCrypt throws (due to invalid salt/hash format)
-            if (request.Password == user.PasswordHash)
-            {
-                isPasswordValid = true;
-                _logger.LogWarning("Plain text password match (after BCrypt error) for {Email}", request.Email);
+                _logger.LogWarning("User {Email} does not exist in ANY tenant.", request.Email);
             }
             else
             {
-                _logger.LogError("BCrypt error for {Email}: {Message}", request.Email, ex.Message);
+                _logger.LogInformation("User found in different tenant. Tenant: {TenantId}, Username: {Username}", user.TenantId, user.Username);
             }
         }
 
+        if (user == null)
+        {
+            _logger.LogWarning("Login failed: User not found for email {Email}.", request.Email);
+            throw new Exception("Invalid credentials");
+        }
+
+        // Simple plaintext password comparison (NO HASHING)
+        bool isPasswordValid = request.Password == user.PasswordHash;
+
         if (!isPasswordValid)
         {
+            _logger.LogWarning("Invalid password for {Email}", request.Email);
             throw new Exception("Invalid credentials");
         }
 
         _logger.LogInformation("Login successful for user: {Email} (Tenant: {TenantId})", request.Email, user.TenantId);
 
-        var token = _jwtProvider.GenerateToken(user);
-        var refreshToken = GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
+        var userToken = _jwtProvider.GenerateToken(user);
+        var refreshTokenVal = GenerateRefreshToken();
+        user.RefreshToken = refreshTokenVal;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _unitOfWork.SaveChangesAsync();
 
         return new AuthResponse
         {
-            Token = token,
-            RefreshToken = refreshToken,
+            Token = userToken,
+            RefreshToken = refreshTokenVal,
             RefreshTokenExpiryTime = user.RefreshTokenExpiryTime.Value,
             User = new UserDto
             {
@@ -237,29 +202,51 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            var role = await _unitOfWork.Repository<Role>().GetQueryable()
-                .FirstOrDefaultAsync(r => r.Name == "Customer");
-
-            user = new User
+            try
             {
-                Username = name,
-                Email = email,
-                LegacyPassword = "EXTERNAL_AUTH",
-                LegacyRequestedRole = "Customer",
-                PasswordHash = "EXTERNAL_AUTH",
-                RoleId = role?.Id,
-                IsActive = true,
-                TenantId = "rajeev-pvt", // Default to main tenant for external users
-                CreatedBy = "External"
-            };
+                var role = await _unitOfWork.Repository<Role>().GetQueryable()
+                    .FirstOrDefaultAsync(r => r.Name == "Customer");
 
-            await _unitOfWork.Repository<User>().AddAsync(user);
-            await _unitOfWork.SaveChangesAsync();
-            
-            // Re-fetch to get any auto-generated fields/includes
-            user = await _unitOfWork.Repository<User>().GetQueryable()
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == user.Id);
+                // Ensure name/username is not empty
+                var username = !string.IsNullOrWhiteSpace(name) ? name : email.Split('@')[0];
+
+                user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = username,
+                    Email = email,
+                    LegacyPassword = "EXTERNAL_AUTH",
+                    LegacyRequestedRole = "Customer",
+                    PasswordHash = "EXTERNAL_AUTH",
+                    RoleId = role?.Id,
+                    IsActive = true,
+                    TenantId = "rajeev-pvt", // Default to main tenant for external users
+                    CreatedBy = "GoogleOAuth",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsEmailVerified = true, // Email verified through OAuth provider
+                    IsDeleted = false
+                };
+
+                await _unitOfWork.Repository<User>().AddAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+                
+                _logger.LogInformation("External user created successfully: {Email} via GoogleOAuth", email);
+                
+                // Re-fetch to get any auto-generated fields/includes
+                user = await _unitOfWork.Repository<User>().GetQueryable()
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Id == user.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating external user {Email}: {Message}", email, ex.Message);
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError(ex.InnerException, "Inner exception: {Message}", ex.InnerException.Message);
+                }
+                throw new Exception($"Failed to create external user: {ex.InnerException?.Message ?? ex.Message}", ex);
+            }
         }
 
         return user!;

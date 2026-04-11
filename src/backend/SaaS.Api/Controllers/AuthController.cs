@@ -37,8 +37,8 @@ public class AuthController : ControllerBase
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-            // Don't return the token in the response body to avoid localStorage storage
-            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
+            // Return token in response body for frontend use
+            return Ok(new { user = response.User, token = response.Token, refreshToken = response.RefreshToken });
         }
         catch (Exception ex)
         {
@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
+            return Ok(new { user = response.User, token = response.Token, refreshToken = response.RefreshToken });
         }
         catch (Exception ex)
         {
@@ -120,7 +120,7 @@ public class AuthController : ControllerBase
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
+            return Ok(new { user = response.User, token = response.Token, refreshToken = response.RefreshToken });
         }
         catch (Exception ex)
         {
@@ -156,37 +156,50 @@ public class AuthController : ControllerBase
     [HttpGet("callback")]
     public async Task<IActionResult> ExternalLoginCallback()
     {
-        var result = await HttpContext.AuthenticateAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+        try
+        {
+            var result = await HttpContext.AuthenticateAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            
+            if (!result.Succeeded)
+            {
+                 return BadRequest("External authentication failed.");
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            var email = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            var name = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                 return BadRequest("Email claim not received from provider.");
+            }
+
+            var user = await _authService.FindOrRegisterExternalUserAsync(email, name ?? email.Split('@')[0]);
+            var tokenValue = _authService.GenerateTokenForUser(user);
         
-        if (!result.Succeeded)
-        {
-             return BadRequest("External authentication failed.");
+            // Issue Secure Cookie
+            var cookieName = _env.IsDevelopment() ? "SaaS-Token" : "__Host-SaaS-Token";
+            Response.Cookies.Append(cookieName, tokenValue, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !_env.IsDevelopment(),
+                SameSite = _env.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            // Redirect to Frontend (Token is NOT in the URL anymore)
+            var redirectUrl = _authService.GetFrontendRedirectUrl(tokenValue, email);
+            return Redirect(redirectUrl);
         }
-
-        var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-        var email = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
-        var name = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
-
-        if (string.IsNullOrEmpty(email))
+        catch (Exception ex)
         {
-             return BadRequest("Email claim not received from provider.");
+            Serilog.Log.Error(ex, "Error during external login callback");
+            return Unauthorized(new 
+            { 
+                errorId = System.Guid.NewGuid().ToString(),
+                message = "An internal server error occurred. Please contact support with the Error ID.",
+                details = ex.InnerException?.Message ?? ex.Message
+            });
         }
-
-        var user = await _authService.FindOrRegisterExternalUserAsync(email, name ?? email.Split('@')[0]);
-        var tokenValue = _authService.GenerateTokenForUser(user);
-        
-        // Issue Secure Cookie
-        var cookieName = _env.IsDevelopment() ? "SaaS-Token" : "__Host-SaaS-Token";
-        Response.Cookies.Append(cookieName, tokenValue, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = !_env.IsDevelopment(),
-            SameSite = _env.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
-        });
-
-        // Redirect to Frontend (Token is NOT in the URL anymore)
-        var redirectUrl = _authService.GetFrontendRedirectUrl(tokenValue, email);
-        return Redirect(redirectUrl);
     }
 }

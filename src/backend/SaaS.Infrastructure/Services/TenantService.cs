@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
 using SaaS.Domain.Entities;
 using SaaS.Infrastructure.Repositories;
+using SaaS.Infrastructure.Persistence;
 
 namespace SaaS.Infrastructure.Services
 {
     public class TenantService : ITenantService
     {
         private readonly IMemoryCache _cache;
-        private readonly MasterDbContext _db;
+        private readonly ApplicationDbContext _db;
 
-        public TenantService(IMemoryCache cache, MasterDbContext db)
+        public TenantService(IMemoryCache cache, ApplicationDbContext db)
         {
             _cache = cache;
             _db = db;
@@ -23,7 +25,7 @@ namespace SaaS.Infrastructure.Services
 
                 return await _db.Tenants
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.Domain == host);
+                    .FirstOrDefaultAsync(t => t.Hostname == host);
             });
         }
     }

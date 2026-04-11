@@ -117,9 +117,6 @@ const SplashScreen: React.FC = () => {
             </Box>
         </Box>
     );
-      </Box>
-    </Box>
-  );
 };
 
 export default SplashScreen;

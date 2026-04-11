@@ -1,7 +1,6 @@
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using SaaS.Api.Controllers;
 using SaaS.Api.Tests.Helpers;
@@ -26,18 +25,11 @@ public class BrandsControllerTests
     {
         _mockBrandService = new Mock<IGenericService<BrandDto, Brand>>();
         _mockMapper = new Mock<IMapper>();
-        
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-            
-        var mockTenantProvider = new Mock<ITenantProvider>();
-        mockTenantProvider.Setup(p => p.GetTenantId()).Returns("test-tenant");
-        _context = new ApplicationDbContext(options, mockTenantProvider.Object);
-        
+        _context = TestDataBuilder.CreateInMemoryContext("test-tenant");
         _controller = new BrandsController(_mockBrandService.Object, _context, _mockMapper.Object);
         _dataBuilder = new TestDataBuilder();
     }
+
 
     [Fact]
     public async Task GetAllBrands_ReturnsOk_WithMappedBrandsAndPorts()
