@@ -45,7 +45,7 @@ namespace SaaS.Api.Tests.Controllers
         {
             // Arrange
             var notifications = new List<NotificationDto> { new NotificationDto { Title = "Test" } };
-            _mockService.Setup(s => s.GetNotificationsAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<bool>()))
+            _mockService.Setup(s => s.GetNotificationsAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<bool>()))
                 .ReturnsAsync(notifications);
 
             // Act
@@ -61,7 +61,7 @@ namespace SaaS.Api.Tests.Controllers
         public async Task GetUnreadCount_ReturnsOkWithCount()
         {
             // Arrange
-            _mockService.Setup(s => s.GetUnreadCountAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>()))
+            _mockService.Setup(s => s.GetUnreadCountAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string?>()))
                 .ReturnsAsync(5);
 
             // Act

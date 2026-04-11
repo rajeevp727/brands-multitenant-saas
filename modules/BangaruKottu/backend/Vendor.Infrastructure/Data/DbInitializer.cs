@@ -18,10 +18,10 @@ public static class DbInitializer
         // ONE: SEED CATEGORIES
         var categories = new List<Category>
         {
-            new Category { Name = "Gold Jewelry", Description = "22K and 24K pure gold ornaments" },
-            new Category { Name = "Diamond Jewelry", Description = "Certified natural diamond collections" },
-            new Category { Name = "Silver Articles", Description = "Pure silver puja items and jewelry" },
-            new Category { Name = "Gemstones", Description = "Precious and semi-precious stones" }
+            new Category { CategoryName = "Gold Jewelry", Description = "22K and 24K pure gold ornaments" },
+            new Category { CategoryName = "Diamond Jewelry", Description = "Certified natural diamond collections" },
+            new Category { CategoryName = "Silver Articles", Description = "Pure silver puja items and jewelry" },
+            new Category { CategoryName = "Gemstones", Description = "Precious and semi-precious stones" }
         };
 
         await context.Categories.AddRangeAsync(categories);
@@ -31,51 +31,51 @@ public static class DbInitializer
         // Since VendorEntity logic might be complex, let's focus on Products for the "Marketplace" feel.
 
         // THREE: SEED PRODUCTS
-        var goldCat = categories.First(c => c.Name == "Gold Jewelry");
-        var diamondCat = categories.First(c => c.Name == "Diamond Jewelry");
+        var goldCat = categories.First(c => c.CategoryName == "Gold Jewelry");
+        var diamondCat = categories.First(c => c.CategoryName == "Diamond Jewelry");
 
         var products = new List<Product>
         {
             new Product
             {
-                Name = "22K Gold Antique Necklace",
+                ProductName = "22K Gold Antique Necklace",
                 Description = "Handcrafted antique finish gold necklace with intricate temple design. Weight: 45g",
                 Price = 285000,
                 StockQuantity = 5,
-                CategoryId = goldCat.Id,
+                CategoryId = goldCat.CategoryId,
                 ImageUrl = "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
             new Product
             {
-                Name = "Diamond Solitaire Ring",
+                ProductName = "Diamond Solitaire Ring",
                 Description = "1 Carat VVS1 Clarity Natural Diamond Ring in 18K White Gold setting.",
                 Price = 145000,
                 StockQuantity = 10,
-                CategoryId = diamondCat.Id,
+                CategoryId = diamondCat.CategoryId,
                 ImageUrl = "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
             new Product
             {
-                Name = "Traditional Gold Bangles Set",
+                ProductName = "Traditional Gold Bangles Set",
                 Description = "Set of 4 refined 22K gold bangles. Total Weight: 60g",
                 Price = 380000,
                 StockQuantity = 3,
-                CategoryId = goldCat.Id,
+                CategoryId = goldCat.CategoryId,
                 ImageUrl = "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
             new Product
             {
-                Name = "Bridal Diamond Choker",
+                ProductName = "Bridal Diamond Choker",
                 Description = "Exquisite diamond choker necklace for weddings. 15 cts total diamond weight.",
                 Price = 1250000,
                 StockQuantity = 1,
-                CategoryId = diamondCat.Id,
+                CategoryId = diamondCat.CategoryId,
                 ImageUrl = "https://images.unsplash.com/photo-1599643478518-17488fbbcd75?w=800",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow

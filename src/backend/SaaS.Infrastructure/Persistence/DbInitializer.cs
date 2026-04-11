@@ -37,6 +37,15 @@ public static class DbInitializer
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Brands' AND column_name='IsVisible') THEN
                         ALTER TABLE ""Brands"" ADD COLUMN ""IsVisible"" BOOLEAN DEFAULT TRUE;
                     END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Tenants' AND column_name='AllowedOrigins') THEN
+                        ALTER TABLE ""Tenants"" ADD COLUMN ""AllowedOrigins"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Tenants' AND column_name='Hostname') THEN
+                        ALTER TABLE ""Tenants"" ADD COLUMN ""Hostname"" TEXT DEFAULT '';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Tenants' AND column_name='Identifier') THEN
+                        ALTER TABLE ""Tenants"" ADD COLUMN ""Identifier"" TEXT DEFAULT '';
+                    END IF;
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Brands' AND column_name='IsActive') THEN
                         ALTER TABLE ""Brands"" ADD COLUMN ""IsActive"" BOOLEAN DEFAULT TRUE;
                     END IF;
@@ -47,7 +56,7 @@ public static class DbInitializer
                         ALTER TABLE ""Products"" ADD COLUMN ""IsDeleted"" BOOLEAN DEFAULT FALSE;
                     END IF;
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Products' AND column_name='MetadataJson') THEN
-                        ALTER TABLE ""Products"" ADD COLUMN ""MetadataJson"" TEXT DEFAULT '{}';
+                        ALTER TABLE ""Products"" ADD COLUMN ""MetadataJson"" TEXT;
                     END IF;
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Products' AND column_name='ImageUrl') THEN
                         ALTER TABLE ""Products"" ADD COLUMN ""ImageUrl"" TEXT;
@@ -55,11 +64,82 @@ public static class DbInitializer
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Orders' AND column_name='IsDeleted') THEN
                         ALTER TABLE ""Orders"" ADD COLUMN ""IsDeleted"" BOOLEAN DEFAULT FALSE;
                     END IF;
+                    
+                    -- manual user table fix
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='CreatedAt') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='CreatedBy') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""CreatedBy"" TEXT DEFAULT 'System';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='LastModifiedAt') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""LastModifiedAt"" TIMESTAMP WITH TIME ZONE;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='LastModifiedBy') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""LastModifiedBy"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='DeletedAt') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""DeletedAt"" TIMESTAMP WITH TIME ZONE;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='DeletedBy') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""DeletedBy"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='RefreshToken') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""RefreshToken"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='RefreshTokenExpiryTime') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""RefreshTokenExpiryTime"" TIMESTAMP WITH TIME ZONE;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='IsDeleted') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""IsDeleted"" BOOLEAN DEFAULT FALSE;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='City') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""City"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='State') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""State"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='StreetAddress') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""StreetAddress"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='PostalCode') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""PostalCode"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='Country') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""Country"" TEXT;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='IsEmailVerified') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""IsEmailVerified"" BOOLEAN DEFAULT FALSE;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='PasswordHash') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""PasswordHash"" TEXT DEFAULT '';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='Password') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""Password"" TEXT DEFAULT '';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='Username') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""Username"" TEXT DEFAULT '';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='TenantId') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""TenantId"" TEXT DEFAULT '';
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='RoleId') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""RoleId"" UUID;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='Role') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""Role"" INTEGER DEFAULT 0;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Products' AND column_name='StockQuantity') THEN
+                        ALTER TABLE ""Products"" ADD COLUMN ""StockQuantity"" INTEGER DEFAULT -1;
+                    END IF;
+                    UPDATE ""Users""
+                    SET ""Password"" = COALESCE(NULLIF(""Password"", ''), NULLIF(""PasswordHash"", ''), 'Pass123')
+                    WHERE ""Password"" IS NULL OR ""Password"" = '';
                 END $$;");
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Manual schema fix check completed (might have already been handled by MigrateAsync).");
+            logger.LogError(ex, "FAILED TO APPLY DB PATCH SCRIPT!");
         }
 
             // 1. Seed Tenant
@@ -77,6 +157,14 @@ public static class DbInitializer
                 await context.SaveChangesAsync();
                 logger.LogInformation("Seeded Default Tenant.");
             }
+
+            // FORCE DB REPAIR: Ensure uuid vs text mismatch is resolved for ITenantEntity
+            try 
+            {
+                await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"Brands\" ALTER COLUMN \"TenantId\" TYPE text USING \"TenantId\"::text;");
+                await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"Notifications\" ALTER COLUMN \"TenantId\" TYPE text USING \"TenantId\"::text;");
+                await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"Tenants\" ALTER COLUMN \"Id\" TYPE text USING \"Id\"::text;");
+            } catch { /* Ignore if already applied or if table missing yet */ }
 
             // 1.1 Seed Other Brands (Check individually)
             var brands = new List<Tenant>
@@ -329,6 +417,7 @@ public static class DbInitializer
                 {
                     Username = "Admin",
                     Email = "admin@rajeev.com",
+                    LegacyPassword = "Pass123",
                     PasswordHash = "Pass123", 
                     RoleId = adminRole?.Id,
                     TenantId = "rajeev-pvt",
@@ -343,6 +432,15 @@ public static class DbInitializer
             }
             else
             {
+                existingAdmin.LegacyPassword = string.IsNullOrWhiteSpace(existingAdmin.LegacyPassword)
+                    ? (string.IsNullOrWhiteSpace(existingAdmin.PasswordHash) ? "Pass123" : existingAdmin.PasswordHash)
+                    : existingAdmin.LegacyPassword;
+                existingAdmin.PasswordHash = string.IsNullOrWhiteSpace(existingAdmin.PasswordHash)
+                    ? existingAdmin.LegacyPassword
+                    : existingAdmin.PasswordHash;
+                existingAdmin.TenantId = string.IsNullOrWhiteSpace(existingAdmin.TenantId) ? "rajeev-pvt" : existingAdmin.TenantId;
+                existingAdmin.IsActive = true;
+                await context.SaveChangesAsync();
                 logger.LogInformation("✅ Admin user already exists: admin@rajeev.com (TenantId: {TenantId}, Active: {IsActive})", 
                     existingAdmin.TenantId, existingAdmin.IsActive);
             }

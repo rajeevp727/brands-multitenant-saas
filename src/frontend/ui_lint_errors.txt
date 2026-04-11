@@ -1,0 +1,49 @@
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\App.tsx
+  20:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\components\dashboard\BrandControlTiles.tsx
+  43:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\components\dashboard\SystemTimeline.tsx
+  48:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\components\layout\LeftSidebar.tsx
+  184:19  error  Unexpected constant truthiness on the left-hand side of a `&&` expression  no-constant-binary-expression
+  239:19  error  Unexpected constant truthiness on the left-hand side of a `&&` expression  no-constant-binary-expression
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\components\notifications\NotificationBell.tsx
+  47:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\components\notifications\NotificationBell.tsx:47:9
+  45 |         if (!isAuthenticated) return;
+  46 |
+> 47 |         fetchNotifications().catch(console.error);
+     |         ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |         const interval = setInterval(() => { fetchNotifications().catch(console.error); }, 60000);
+  49 |         return () => clearInterval(interval);
+  50 |     }, [isAuthenticated, fetchNotifications]);  react-hooks/set-state-in-effect
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\pages\Dashboard.tsx
+  232:83  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\pages\LoginPage.tsx
+  38:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\shared\services\auth.ts
+  75:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:18  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\Rajeev\Projects\MultiTenantSaaS\src\frontend\src\shared\utils\urlHelper.ts
+  49:18  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 13 problems (13 errors, 0 warnings)
+

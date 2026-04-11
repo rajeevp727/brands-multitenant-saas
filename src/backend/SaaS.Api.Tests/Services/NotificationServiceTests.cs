@@ -51,15 +51,15 @@ public class NotificationServiceTests
     public async Task GetNotificationsAsync_FiltersByTenant()
     {
         // Arrange
-        var tenantId = Guid.NewGuid();
-        var otherTenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid().ToString();
+        var otherTenantId = Guid.NewGuid().ToString();
         var userId = Guid.NewGuid();
 
         _context.Notifications.AddRange(new List<Notification>
         {
             new Notification { Title = "T1", TenantId = tenantId, TargetRole = "All", CreatedAt = DateTime.UtcNow },
             new Notification { Title = "T2", TenantId = otherTenantId, TargetRole = "All", CreatedAt = DateTime.UtcNow },
-            new Notification { Title = "Global", TenantId = null, TargetRole = "All", CreatedAt = DateTime.UtcNow }
+            new Notification { Title = "Global", TenantId = string.Empty, TargetRole = "All", CreatedAt = DateTime.UtcNow }
         });
         await _context.SaveChangesAsync();
 
@@ -76,8 +76,8 @@ public class NotificationServiceTests
     public async Task GetNotificationsAsync_SuperAdmin_SeesAll()
     {
         // Arrange
-        var tenantId = Guid.NewGuid();
-        var otherTenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid().ToString();
+        var otherTenantId = Guid.NewGuid().ToString();
 
         _context.Notifications.AddRange(new List<Notification>
         {
@@ -113,7 +113,7 @@ public class NotificationServiceTests
     public async Task GetUnreadCountAsync_ReturnsCorrectCount()
     {
         // Arrange
-        var tenantId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid().ToString();
         var userId = Guid.NewGuid();
         _context.Notifications.AddRange(new List<Notification>
         {

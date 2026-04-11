@@ -191,4 +191,44 @@ public class AuthControllerTests
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
     }
+
+    [Fact]
+    public async Task RefreshToken_WithValidToken_ReturnsOk()
+    {
+        // Arrange
+        var request = _dataBuilder.Create<RefreshTokenRequest>();
+        var response = _dataBuilder.Create<AuthResponse>();
+        _mockAuthService.Setup(s => s.RefreshTokenAsync(request)).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.RefreshToken(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = result as OkObjectResult;
+        
+        var valueType = okResult.Value.GetType();
+        var userProp = valueType.GetProperty("user");
+        var tokenProp = valueType.GetProperty("refreshToken");
+        
+        var user = userProp.GetValue(okResult.Value);
+        var token = tokenProp.GetValue(okResult.Value);
+        
+        user.Should().BeEquivalentTo(response.User);
+        token.Should().Be(response.RefreshToken);
+    }
+
+    [Fact]
+    public async Task RefreshToken_WithInvalidToken_ReturnsUnauthorized()
+    {
+        // Arrange
+        var request = _dataBuilder.Create<RefreshTokenRequest>();
+        _mockAuthService.Setup(s => s.RefreshTokenAsync(request)).ThrowsAsync(new Exception("Invalid token"));
+
+        // Act
+        var result = await _controller.RefreshToken(request);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedObjectResult>();
+    }
 }

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace SaaS.Shared.Extensions;
 
@@ -39,6 +40,19 @@ public static class SharedStartupExtensions
                 ValidIssuer = issuer,
                 ValidAudience = audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var token = context.Request.Cookies["SaaS-Token"] ?? context.Request.Cookies["__Host-SaaS-Token"];
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                }
             };
         });
 

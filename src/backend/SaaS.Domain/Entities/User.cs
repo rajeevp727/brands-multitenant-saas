@@ -7,6 +7,16 @@ public class User : AuditableEntity<Guid>
 {
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    [Column("Password")]
+    public string LegacyPassword { get; set; } = string.Empty;
+    [Column("RequestedRole")]
+    public string LegacyRequestedRole { get; set; } = "Admin";
+    [Column("LastLogin")]
+    public DateTime LegacyLastLogin { get; set; } = DateTime.UtcNow;
+    [Column("HasVisitedFromDomain")]
+    public bool LegacyHasVisitedFromDomain { get; set; } = false;
+    [Column("HasSeenCta")]
+    public bool LegacyHasSeenCta { get; set; } = false;
     public string PasswordHash { get; set; } = string.Empty;
     public Guid? RoleId { get; set; }
     public bool IsActive { get; set; } = true;

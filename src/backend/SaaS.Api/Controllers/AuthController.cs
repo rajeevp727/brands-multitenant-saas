@@ -38,7 +38,7 @@ public class AuthController : ControllerBase
             });
 
             // Don't return the token in the response body to avoid localStorage storage
-            return Ok(new { user = response.User });
+            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
         }
         catch (Exception ex)
         {
@@ -59,6 +59,30 @@ public class AuthController : ControllerBase
         });
         
         return Ok(new { message = "Logged out successfully" });
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            var response = await _authService.RefreshTokenAsync(request);
+            
+            var cookieName = _env.IsDevelopment() ? "SaaS-Token" : "__Host-SaaS-Token";
+            Response.Cookies.Append(cookieName, response.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !_env.IsDevelopment(),
+                SameSite = _env.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
     }
 
     [HttpGet("me")]
@@ -96,7 +120,7 @@ public class AuthController : ControllerBase
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-            return Ok(new { user = response.User });
+            return Ok(new { user = response.User, refreshToken = response.RefreshToken });
         }
         catch (Exception ex)
         {

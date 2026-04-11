@@ -28,7 +28,7 @@ namespace SaaS.Infrastructure.Services
             return MapToDto(notification);
         }
 
-        public async Task<List<NotificationDto>> GetNotificationsAsync(Guid userId, string userRole, Guid? tenantId, bool isSuperAdmin)
+        public async Task<List<NotificationDto>> GetNotificationsAsync(Guid userId, string userRole, string? tenantId, bool isSuperAdmin)
         {
             var query = _context.Notifications.AsQueryable();
 
@@ -37,15 +37,16 @@ namespace SaaS.Infrastructure.Services
             {
                 // Super Admin can see ALL notifications (Global View)
                 // Optionally, if they passed a specific tenantId to filter by, we respect it
-                if (tenantId.HasValue)
+                if (!string.IsNullOrEmpty(tenantId))
                 {
-                    query = query.Where(n => n.TenantId == tenantId.Value);
+                    query = query.Where(n => n.TenantId == tenantId);
                 }
             }
             else
             {
-                // Regular User: MUST only see their own tenant's notifications OR Global System notifications (TenantId == null)
-                query = query.Where(n => n.TenantId == tenantId || n.TenantId == null);
+                // Regular User: MUST only see their own tenant's notifications
+                // Standardizing: n.TenantId == tenantId.
+                query = query.Where(n => n.TenantId == tenantId);
             }
 
             // 2. Role/User Filter
@@ -78,15 +79,15 @@ namespace SaaS.Infrastructure.Services
             }
         }
 
-        public async Task<int> GetUnreadCountAsync(Guid userId, string userRole, Guid? tenantId)
+        public async Task<int> GetUnreadCountAsync(Guid userId, string userRole, string? tenantId)
         {
              // Simplified count logic matching GetNotifications filters roughly
              var query = _context.Notifications.AsNoTracking();
              
-             if (tenantId.HasValue)
-                query = query.Where(n => n.TenantId == tenantId || n.TenantId == null);
+             if (!string.IsNullOrEmpty(tenantId))
+                query = query.Where(n => n.TenantId == tenantId);
              else
-                query = query.Where(n => n.TenantId == null); // Fallback
+                query = query.Where(n => n.TenantId == string.Empty); // Fallback to empty for no tenant cases (or adjust according to requirements)
 
              query = query.Where(n => 
                     (n.TargetRole == "All" || n.TargetRole == userRole || n.UserId == userId) && 

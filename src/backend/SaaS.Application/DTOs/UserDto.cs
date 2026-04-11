@@ -5,9 +5,9 @@ public class UserDto
     public string Id { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Role { get; set; } = string.Empty; // Role name for frontend/SSO
+    public string Role { get; set; } = string.Empty;
     public string TenantId { get; set; } = string.Empty;
-    public Guid? RoleId { get; set; } // Keep for internal mapping
+    public Guid? RoleId { get; set; }
     public bool IsActive { get; set; }
     public string? PhoneNumber { get; set; }
     public string? FirstName { get; set; }
@@ -17,4 +17,5 @@ public class UserDto
     public string? State { get; set; }
     public string? PostalCode { get; set; }
     public string? Country { get; set; }
+    public DateTime? CreatedAt { get; set; }
 }

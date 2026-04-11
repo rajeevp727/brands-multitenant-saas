@@ -9,8 +9,8 @@ namespace SaaS.Application.Interfaces
     public interface INotificationService
     {
         Task<NotificationDto> CreateNotificationAsync(Notification notification);
-        Task<List<NotificationDto>> GetNotificationsAsync(Guid userId, string userRole, Guid? tenantId, bool isSuperAdmin);
+        Task<List<NotificationDto>> GetNotificationsAsync(Guid userId, string userRole, string? tenantId, bool isSuperAdmin);
         Task MarkAsReadAsync(Guid notificationId);
-        Task<int> GetUnreadCountAsync(Guid userId, string userRole, Guid? tenantId);
+        Task<int> GetUnreadCountAsync(Guid userId, string userRole, string? tenantId);
     }
 }

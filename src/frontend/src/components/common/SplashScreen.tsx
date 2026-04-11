@@ -1,24 +1,25 @@
-
 import React from 'react';
-import { Box, Typography, keyframes, alpha } from '@mui/material';
+import { Box, Typography, keyframes, alpha, useTheme } from '@mui/material';
 import { useBrand } from '../../providers/BrandContext';
-import { useTheme } from '@mui/material/styles';
 import CorporateLogo from '../../images/RajeevsTech.png';
 
-const pulse = keyframes`
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.5; }
-`;
-
 const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
+const pulse = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+`;
+
 const SplashScreen: React.FC = () => {
-    const { brand } = useBrand();
-    const theme = useTheme();
+  const { brand } = useBrand();
+  const theme = useTheme();
+  const isCorporate = !brand?.id || brand.id === 'default' || brand.id === 'rajeev-pvt' || brand.name?.toLowerCase().includes('rajeev');
+  const title = isCorporate ? "Rajeev's Tech" : brand.name;
+  const subtitle = isCorporate ? 'Multi-brand digital launchpad' : brand.slogan;
 
     return (
         <Box
@@ -91,9 +92,34 @@ const SplashScreen: React.FC = () => {
                         )}
                     </Box>
                 )}
+
+                <Box sx={{ textAlign: 'center' }}>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            fontWeight: 700,
+                            color: brand?.id === 'rajeev-pvt' || brand?.name?.includes('Rajeev') || !brand?.id ? '#fff' : brand?.primaryColor || theme.palette.primary.main,
+                            mb: 1
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            color: brand?.id === 'rajeev-pvt' || brand?.name?.includes('Rajeev') || !brand?.id ? 'rgba(255,255,255,0.8)' : theme.palette.text.secondary,
+                            maxWidth: 400
+                        }}
+                    >
+                        {subtitle}
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     );
+      </Box>
+    </Box>
+  );
 };
 
 export default SplashScreen;

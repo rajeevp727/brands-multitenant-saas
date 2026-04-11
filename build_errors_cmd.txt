@@ -1,0 +1,10 @@
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(5094,5): error MSB3027: Could not copy "D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Application\bin\Debug\net8.0\SaaS.Application.dll" to "bin\Debug\net8.0\SaaS.Application.dll". Exceeded retry count of 10. Failed. The file is locked by: "SaaS.Api (4028)" [D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\SaaS.Api.csproj]
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(5094,5): error MSB3021: Unable to copy file "D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Application\bin\Debug\net8.0\SaaS.Application.dll" to "bin\Debug\net8.0\SaaS.Application.dll". The process cannot access the file 'D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\bin\Debug\net8.0\SaaS.Application.dll' because it is being used by another process. [D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\SaaS.Api.csproj]
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(5094,5): error MSB3027: Could not copy "D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Infrastructure\bin\Debug\net8.0\SaaS.Infrastructure.dll" to "bin\Debug\net8.0\SaaS.Infrastructure.dll". Exceeded retry count of 10. Failed. The file is locked by: "SaaS.Api (4028)" [D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\SaaS.Api.csproj]
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(5094,5): error MSB3021: Unable to copy file "D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Infrastructure\bin\Debug\net8.0\SaaS.Infrastructure.dll" to "bin\Debug\net8.0\SaaS.Infrastructure.dll". The process cannot access the file 'D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\bin\Debug\net8.0\SaaS.Infrastructure.dll' because it is being used by another process. [D:\Rajeev\Projects\MultiTenantSaaS\src\backend\SaaS.Api\SaaS.Api.csproj]
+
+Build FAILED.
+    20 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:14.13

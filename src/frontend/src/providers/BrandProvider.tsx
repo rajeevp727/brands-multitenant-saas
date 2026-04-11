@@ -10,43 +10,27 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const response = await api.get('/brands/current');
-        const data = response.data;
-
-        const config: BrandConfig = {
-          id: data.tenantId || 'default',
-          name: data.name || 'Rajeev\'s Pvt. Ltd.',
-          slogan: data.slogan || 'Empowering your business',
-          description: data.description || 'A multi-tenant white-label solution.',
-          primaryColor: data.primaryColor || '#1976d2',
-          secondaryColor: data.secondaryColor || '#dc004e',
-          logoUrl: data.logoUrl || '/logo.png',
-          email: data.email || 'support@saas.com',
-          phone: data.phone || '+1 (000) 000-0000',
+        const { data } = await api.get('/brands/current');
+        const isCorporate = !data?.tenantId || data.tenantId === 'rajeev-pvt' || String(data?.name ?? '').toLowerCase().includes('rajeev');
+        const nextBrand: BrandConfig = {
+          id: data.tenantId || defaultBrand.id,
+          name: isCorporate ? defaultBrand.name : (data.name || defaultBrand.name),
+          slogan: isCorporate ? defaultBrand.slogan : (data.slogan || defaultBrand.slogan),
+          description: data.description || defaultBrand.description,
+          primaryColor: data.primaryColor || defaultBrand.primaryColor,
+          secondaryColor: data.secondaryColor || defaultBrand.secondaryColor,
+          logoUrl: data.logoUrl || defaultBrand.logoUrl,
+          email: data.email || defaultBrand.email,
+          phone: data.phone || defaultBrand.phone,
           privacyPolicy: data.privacyPolicy,
           termsOfService: data.termsOfService,
-          builtBy: data.builtBy || 'OmegaTechnologies Pvt Ltd.',
-          // Feature mapping from configJson or categories
-          features: data.configJson ? (JSON.parse(data.configJson).features || ['products']) : ['products']
+          builtBy: data.builtBy || defaultBrand.builtBy,
+          features: ['dashboard']
         };
-
-        setBrand(config);
-
-        // Dynamically set CSS variables for theme and document title
-        document.documentElement.style.setProperty('--primary-color', config.primaryColor);
-        document.documentElement.style.setProperty('--secondary-color', config.secondaryColor);
-        document.title = config.name;
-
-        // Dynamically update favicon
-        const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-        if (link) {
-          link.href = config.logoUrl;
-        } else {
-          const newLink = document.createElement('link');
-          newLink.rel = 'icon';
-          newLink.href = config.logoUrl;
-          document.head.appendChild(newLink);
-        }
+        setBrand(nextBrand);
+        document.documentElement.style.setProperty('--primary-color', nextBrand.primaryColor);
+        document.documentElement.style.setProperty('--secondary-color', nextBrand.secondaryColor);
+        document.title = nextBrand.name;
       } catch (error) {
         console.error('Failed to fetch brand config, using defaults', error);
       } finally {
@@ -57,9 +41,5 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     fetchBrand();
   }, []);
 
-  return (
-    <BrandContext.Provider value={{ brand, loading }}>
-      {children}
-    </BrandContext.Provider>
-  );
+  return <BrandContext.Provider value={{ brand, loading }}>{children}</BrandContext.Provider>;
 };

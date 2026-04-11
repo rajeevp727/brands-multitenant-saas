@@ -21,6 +21,9 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Isolate to its own schema to prevent collisions in shared DB
+        modelBuilder.HasDefaultSchema("bangaru");
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");

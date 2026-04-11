@@ -18,11 +18,13 @@ export default defineConfig({
         target: 'http://127.0.0.1:5114',
         changeOrigin: true,
         secure: false,
+        xfwd: true,
       },
       '/signin-google': {
         target: 'http://127.0.0.1:5114',
         changeOrigin: true,
         secure: false,
+        xfwd: true,
       },
       '/health': {
         target: 'http://127.0.0.1:5114',

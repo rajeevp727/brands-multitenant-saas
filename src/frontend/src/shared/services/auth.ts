@@ -72,6 +72,7 @@ class AuthService {
 
     async checkAuth(): Promise<User | null> {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const response = await api.get<any>('/auth/me');
             const user: User = {
                 id: response.data.userId,
@@ -82,7 +83,7 @@ class AuthService {
             };
             this.setCurrentUser(user);
             return user;
-        } catch (error) {
+        } catch {
             this.removeCurrentUser();
             return null;
         }

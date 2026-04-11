@@ -55,7 +55,7 @@ namespace SaaS.Api.Controllers
         {
             var notification = new Notification
             {
-                TenantId = request.TenantId,
+                TenantId = request.TenantId?.ToString() ?? string.Empty,
                 BrandName = request.BrandName,
                 TargetRole = request.TargetRole, // "All", "Admin", etc.
                 Type = request.Type,
@@ -81,10 +81,9 @@ namespace SaaS.Api.Controllers
             return User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
         }
 
-        private Guid? GetCurrentTenantId()
+        private string? GetCurrentTenantId()
         {
-            var claim = User.FindFirst("tenantid")?.Value; // Standardize claim name
-            return claim != null ? Guid.Parse(claim) : null;
+            return User.FindFirst("tenantId")?.Value ?? User.FindFirst("tenantid")?.Value;
         }
 
         private bool IsSuperAdmin()
@@ -98,7 +97,7 @@ namespace SaaS.Api.Controllers
 
     public class CreateNotificationRequest
     {
-        public Guid? TenantId { get; set; }
+        public string? TenantId { get; set; }
         public string BrandName { get; set; } = string.Empty;
         public string TargetRole { get; set; } = "All";
         public string Type { get; set; } = "Info";

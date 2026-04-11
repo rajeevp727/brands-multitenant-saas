@@ -144,9 +144,9 @@ public class ApplicationDbContext : DbContext
             }
         }
 
-        // -----------------------------
-        // AUDIT CREATION (BEFORE SAVE → single DB transaction)
-        // -----------------------------
+        }
+
+        return await OnBeforeSaveChanges(tenantId);
         ChangeTracker.DetectChanges();
 
         var auditEntries = new List<AuditEntry>();

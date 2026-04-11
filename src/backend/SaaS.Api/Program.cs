@@ -26,7 +26,6 @@ Serilog.Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
-// Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddHostedService<KeepAliveService>();
@@ -64,7 +63,8 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | 
-                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost;
     // CRITICAL for Render/Vercel proxies: Clear restrictions
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
@@ -82,6 +82,21 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // DEBUG: Dump Users table columns to identify where "Password" column came from
+    try {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<SaaS.Infrastructure.Persistence.ApplicationDbContext>();
+        // Using ADO.NET because SqlQueryRaw is for entities
+        using var conn = context.Database.GetDbConnection();
+        await conn.OpenAsync();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Users' AND table_schema = 'public'";
+        var columns = new List<string>();
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync()) columns.Add(reader.GetString(0));
+        Console.WriteLine("DEBUG SCHEMA [public.Users]: " + string.Join(", ", columns));
+    } catch (Exception ex) { Console.WriteLine("DEBUG SCHEMA ERROR: " + ex.Message); }
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -127,6 +142,24 @@ app.UseRateLimiter();
 app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.MapControllers();
+
+app.MapGet("/api/debug/schema", async (SaaS.Infrastructure.Persistence.ApplicationDbContext ctx) => {
+    var dtos = new System.Collections.Generic.List<string>();
+    using var command = ctx.Database.GetDbConnection().CreateCommand();
+    command.CommandText = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Users'";
+    await ctx.Database.OpenConnectionAsync();
+    using var reader = await command.ExecuteReaderAsync();
+    while (await reader.ReadAsync()) { dtos.Add(reader.GetString(0)); }
+    return Microsoft.AspNetCore.Http.Results.Ok(dtos);
+});
+
+app.MapGet("/api/debug/force-schema", async (SaaS.Infrastructure.Persistence.ApplicationDbContext ctx) => {
+    try {
+        await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(ctx.Database, "ALTER TABLE \"Users\" ADD COLUMN \"CreatedAt\" timestamp with time zone NOT NULL DEFAULT NOW();");
+        await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(ctx.Database, "ALTER TABLE \"Users\" ADD COLUMN \"RefreshToken\" text;");
+        return Microsoft.AspNetCore.Http.Results.Ok("Forced");
+    } catch (System.Exception e) { return Microsoft.AspNetCore.Http.Results.BadRequest(e.ToString()); }
+});
 
 try
 {

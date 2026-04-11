@@ -44,6 +44,7 @@ const NotificationBell: React.FC = () => {
     useEffect(() => {
         if (!isAuthenticated) return;
 
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchNotifications().catch(console.error);
         const interval = setInterval(() => { fetchNotifications().catch(console.error); }, 60000);
         return () => clearInterval(interval);

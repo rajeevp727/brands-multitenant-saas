@@ -134,6 +134,9 @@ namespace SaaS.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LogoUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -235,8 +238,9 @@ namespace SaaS.Infrastructure.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()

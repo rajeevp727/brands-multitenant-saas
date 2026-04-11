@@ -1,15 +1,16 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SaaS.Domain.Common;
 
 namespace SaaS.Domain.Entities
 {
-    public class Notification
+    public class Notification : ITenantEntity
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public Guid? TenantId { get; set; } // Nullable for Global System Notifications
+        public string TenantId { get; set; } = string.Empty; // Fixed: string instead of Guid
 
         [Required]
         [MaxLength(100)]
