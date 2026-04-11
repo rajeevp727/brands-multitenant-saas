@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PWA Icon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #0b0f1a;
+      color: #fff;
+    }
+    canvas {
+      border: 1px solid #38f2e6;
+      margin: 10px;
+    }
+    button {
+      background: #38f2e6;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    button:hover {
+      background: #1fd1c1;
+    }
+  </style>
+</head>
+<body>
+  <h1>PWA Icon Generator for Omega Technologies</h1>
+  <p>This tool generates 192x192 and 512x512 PNG icons for PWA.</p>
+  
+  <canvas id="icon192" width="192" height="192"></canvas>
+  <canvas id="icon512" width="512" height="512"></canvas>
+  
+  <br>
+  <button onclick="generateIcons()">Generate Icons</button>
+  <button onclick="downloadIcon('icon192', 'icon-192x192.png')">Download 192x192</button>
+  <button onclick="downloadIcon('icon512', 'icon-512x512.png')">Download 512x512</button>
+  
+  <script>
+    function generateIcons() {
+      const canvas192 = document.getElementById('icon192');
+      const canvas512 = document.getElementById('icon512');
+      const ctx192 = canvas192.getContext('2d');
+      const ctx512 = canvas512.getContext('2d');
+      
+      // Background gradient
+      const gradient192 = ctx192.createLinearGradient(0, 0, 192, 192);
+      gradient192.addColorStop(0, '#0b0f1a');
+      gradient192.addColorStop(1, '#121829');
+      
+      const gradient512 = ctx512.createLinearGradient(0, 0, 512, 512);
+      gradient512.addColorStop(0, '#0b0f1a');
+      gradient512.addColorStop(1, '#121829');
+      
+      // Fill background
+      ctx192.fillStyle = gradient192;
+      ctx192.fillRect(0, 0, 192, 192);
+      ctx512.fillStyle = gradient512;
+      ctx512.fillRect(0, 0, 512, 512);
+      
+      // Draw Omega symbol (Ω) or logo
+      ctx192.fillStyle = '#38f2e6';
+      ctx192.font = 'bold 120px Arial';
+      ctx192.textAlign = 'center';
+      ctx192.textBaseline = 'middle';
+      ctx192.fillText('Ω', 96, 96);
+      
+      ctx512.fillStyle = '#38f2e6';
+      ctx512.font = 'bold 320px Arial';
+      ctx512.textAlign = 'center';
+      ctx512.textBaseline = 'middle';
+      ctx512.fillText('Ω', 256, 256);
+    }
+    
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // Auto-generate on load
+    window.onload = generateIcons;
+  </script>
+</body>
+</html>
