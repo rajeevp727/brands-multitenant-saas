@@ -21,49 +21,27 @@ interface User {
 /**
  * Calculates the base URL for a brand based on portalUrl, configJson and port.
  */
-export const calculateBaseUrl = (brand: BrandData, isProd: boolean): string => {
-    let baseUrl = '';
+export const calculateBaseUrl = (brand: BrandData): string => {
     const config = JSON.parse(brand.configJson || '{}');
-    const port = brand.port || config.port;
 
-    // 1. In Local Development, prioritize the current host and port if defined
-    // This allows branding to work when accessing via IP (e.g. 192.168.x.x)
-    if (!isProd && port) {
-        return `${window.location.protocol}//${window.location.hostname}:${port}/`;
+    // ✅ 1. ALWAYS DB URL FIRST
+    if (config.url) {
+        return config.url.endsWith('/') ? config.url : config.url + '/';
     }
 
+    // ✅ 2. portalUrl fallback
     if (brand.portalUrl) {
-        try {
-            let urlToParse = brand.portalUrl;
-            if (!urlToParse.includes('://')) urlToParse = 'https://' + urlToParse;
-
-            const urlObj = new URL(urlToParse);
-
-            if (config.url) {
-                baseUrl = config.url.endsWith('/') ? config.url : config.url + '/';
-            } else if (urlObj.hostname !== 'localhost' && urlObj.hostname !== '127.0.0.1') {
-                baseUrl = `${urlObj.protocol}//${urlObj.hostname}/`;
-            } else {
-                baseUrl = urlObj.origin + '/';
-            }
-        } catch (e) {
-            baseUrl = config.url || brand.portalUrl || '';
-            if (baseUrl && !baseUrl.endsWith('/')) baseUrl += '/';
+        let url = brand.portalUrl;
+        if (!url.startsWith('http')) {
+            url = 'https://' + url;
         }
+        return url.endsWith('/') ? url : url + '/';
     }
 
-    if (!baseUrl) {
-        if (!isProd) {
-            baseUrl = `http://localhost/`;
-        } else {
-            const subdomain = config.vercel || 'default';
-            baseUrl = `https://${subdomain}.vercel.app/`;
-        }
-    }
-
-    return baseUrl;
+    // ✅ 3. LAST fallback (only if nothing exists)
+    const subdomain = config.vercel || brand.tenantId || 'default';
+    return `https://${subdomain}.vercel.app/`;
 };
-
 /**
  * Generates the final URL with SSO parameters.
  * Note: With the move to secure HttpOnly cookies, we no longer pass the JWT in the URL.

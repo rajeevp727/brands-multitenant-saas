@@ -15,34 +15,35 @@ public class HttpContextTenantProvider : ITenantProvider
     public string? GetTenantId()
     {
         var context = _httpContextAccessor.HttpContext;
-        if (context == null) return null;
+        if (context == null)
+            return null;
 
-        // 1. Priority: Validated TenantId from JWT claims (Trusted source)
+        // ✅ 1. JWT Claim (MOST TRUSTED)
         var claimTenantId = context.User.FindFirst("tenantId")?.Value;
         if (!string.IsNullOrEmpty(claimTenantId))
-        {
             return claimTenantId;
-        }
 
-        // 2. Fallback: Header (Useful for unauthenticated requests like registration/login discovery)
+        // ✅ 2. Header
         var headerTenantId = context.Request.Headers["X-Tenant-Id"].FirstOrDefault();
         if (!string.IsNullOrEmpty(headerTenantId))
-        {
             return headerTenantId;
-        }
-        
-        // 3. Last Resort: Hostname
+
+        // ✅ 3. Dev fallback
         var host = context.Request.Host.Host;
         var port = context.Request.Host.Port;
 
-        // Development / Direct API Access handling
         if (host == "localhost" || host == "127.0.0.1")
         {
-            if (port == 5114) return "rajeev-pvt"; // SaaS API
-            if (port == 7001) return "green-pantry"; // GreenPantry API
-            if (port == 7002) return "bangaru-kottu"; // Vendor API
+            if (port == 5114) return "rajeev-pvt";
+            if (port == 7001) return "green-pantry";
+            if (port == 7002) return "bangaru-kottu";
         }
 
-        return context.Request.Host.Value;
+        // ✅ 4. Subdomain
+        var parts = host.Split('.');
+        if (parts.Length > 2)
+            return parts[0];
+
+        return null;
     }
 }

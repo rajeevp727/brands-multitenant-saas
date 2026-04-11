@@ -47,7 +47,8 @@ export default function Dashboard() {
   const openBrand = (brand: Brand) => {
     const config = parseConfig(brand.configJson);
     if (config.status === 'coming_soon' || brand.tenantId === 'morebrands') return;
-    const baseUrl = calculateBaseUrl(brand, import.meta.env.PROD);
+    const baseUrl = calculateBaseUrl(brand);
+    // let baseUrl = config.url || brand.portalUrl;
     const url = user ? generateFinalUrl(baseUrl, brand, user as never) : baseUrl;
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -77,7 +78,7 @@ export default function Dashboard() {
         {visibleBrands.map((brand, index) => {
           const config = parseConfig(brand.configJson);
           const comingSoon = config.status === 'coming_soon' || brand.tenantId === 'morebrands';
-          const target = brand.portalUrl || config.url || calculateBaseUrl(brand, import.meta.env.PROD);
+          const target = brand.portalUrl || config.url || calculateBaseUrl(brand);
           return (
             <motion.button
               key={`${brand.tenantId}-${brand.id}-${index}`}
@@ -95,7 +96,7 @@ export default function Dashboard() {
               <p className="tile-slogan">{brand.slogan || brand.tenantId}</p>
               <p className="tile-copy">{brand.description}</p>
               <div className="tile-footer">
-                <span>{target}</span>
+                <span></span>
                 <span className="tile-cta">{comingSoon ? 'Await launch' : 'Open portal'} <ArrowUpRight size={16} /></span>
               </div>
             </motion.button>
