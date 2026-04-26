@@ -4,18 +4,18 @@
         "Items": [
             {
                 "Name": "Irani Chai",
-                "Description": "Authentic Hyderabadi special Irani Chai",
-                "Price": 30.00,
+                "Description": "Iconic Hyderabadi Irani Chai brewed with milk and a hint of malt",
+                "Price": 40.00,
                 "Category": "Beverages",
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=800"
             },
             {
                 "Name": "Bun Maska",
-                "Description": "Fresh bun sliced and filled with butter maska",
-                "Price": 50.00,
+                "Description": "Soft fresh bun generously slathered with butter maska - the classic Niloufer signature",
+                "Price": 60.00,
                 "Category": "Bakery",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -24,13 +24,103 @@
             },
             {
                 "Name": "Osmania Biscuit",
-                "Description": "Classic buttery Osmania Biscuits",
-                "Price": 20.00,
+                "Description": "Traditional buttery Hyderabadi Osmania biscuits, perfect with chai",
+                "Price": 30.00,
                 "Category": "Bakery",
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800"
+            },
+            {
+                "Name": "Veg Puff",
+                "Description": "Flaky pastry puff with spiced vegetable filling",
+                "Price": 40.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800"
+            },
+            {
+                "Name": "Paneer Puff",
+                "Description": "Crispy pastry filled with seasoned paneer stuffing",
+                "Price": 60.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800"
+            },
+            {
+                "Name": "Cheese Puff",
+                "Description": "Golden puff pastry loaded with melted cheese filling",
+                "Price": 70.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800"
+            },
+            {
+                "Name": "Aloo Samosa",
+                "Description": "Classic crispy samosa with spiced potato filling",
+                "Price": 30.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=800"
+            },
+            {
+                "Name": "Mirchi Bajji",
+                "Description": "Stuffed green chilli fritters - spicy Hyderabadi street food staple",
+                "Price": 50.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1567337710282-00832b415979?w=800"
+            },
+            {
+                "Name": "Paneer Hyderabadi Sandwich",
+                "Description": "Grilled sandwich with spiced paneer and Hyderabadi masala",
+                "Price": 180.00,
+                "Category": "Sandwiches",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800"
+            },
+            {
+                "Name": "Cheese Garlic Sandwich",
+                "Description": "Toasted sandwich loaded with cheese and roasted garlic",
+                "Price": 150.00,
+                "Category": "Sandwiches",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800"
+            },
+            {
+                "Name": "Black Forest Pastry",
+                "Description": "Layered chocolate cake with whipped cream and cherries",
+                "Price": 90.00,
+                "Category": "Pastries",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800"
+            },
+            {
+                "Name": "Chocolate Pastry",
+                "Description": "Rich chocolate sponge with chocolate cream frosting",
+                "Price": 80.00,
+                "Category": "Pastries",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800"
             }
         ]
     },
@@ -39,30 +129,123 @@
         "Items": [
             {
                 "Name": "Ghee Podi Dosa",
-                "Description": "Crispy dosa topped with spicy podi and generous amounts of ghee",
-                "Price": 150.00,
-                "Category": "South Indian",
+                "Description": "Crispy dosa generously topped with spicy podi powder and melted ghee - the signature bestseller",
+                "Price": 160.00,
+                "Category": "Dosa",
                 "IsVegetarian": true,
+                "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Ghee Podi Masala Dosa",
+                "Description": "Masala dosa with potato filling, ghee and spicy podi powder",
+                "Price": 190.00,
+                "Category": "Dosa",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Benne Masala Dosa",
+                "Description": "Karnataka style butter masala dosa with crispy edges",
+                "Price": 170.00,
+                "Category": "Dosa",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
             },
             {
                 "Name": "Ghee Podi Idli",
-                "Description": "Soft idlis soaked in podi and ghee",
-                "Price": 120.00,
-                "Category": "South Indian",
+                "Description": "Soft steamed idlis tossed in spicy podi and fragrant ghee",
+                "Price": 100.00,
+                "Category": "Idli",
                 "IsVegetarian": true,
+                "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
             },
             {
+                "Name": "Sambar Button Idli",
+                "Description": "Mini button idlis dunked in hot spicy sambar",
+                "Price": 120.00,
+                "Category": "Idli",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Bangalore Idli",
+                "Description": "Classic Bangalore-style soft idlis served with coconut chutney and sambar",
+                "Price": 80.00,
+                "Category": "Idli",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Medu Vada",
+                "Description": "Crispy urad dal vada served with sambar and chutney",
+                "Price": 90.00,
+                "Category": "Vada",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Ven Pongal",
+                "Description": "Creamy rice and moong dal pongal tempered with pepper and cumin",
+                "Price": 110.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
+                "Name": "Bisi Bele Bath",
+                "Description": "Karnataka-style spicy lentil rice with vegetables and special masala",
+                "Price": 130.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
+                "Name": "Curd Rice",
+                "Description": "Comforting yogurt rice tempered with mustard seeds and curry leaves",
+                "Price": 100.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
                 "Name": "Filter Coffee",
-                "Description": "Authentic South Indian filter coffee",
-                "Price": 45.00,
+                "Description": "Authentic South Indian filter coffee with frothy milk",
+                "Price": 90.00,
                 "Category": "Beverages",
                 "IsVegetarian": true,
+                "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1616259020948-261bd7faafec?w=800"
+            },
+            {
+                "Name": "Kesari Bath",
+                "Description": "Sweet semolina dessert flavored with saffron and ghee",
+                "Price": 80.00,
+                "Category": "Desserts",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800"
             }
         ]
     },
@@ -70,31 +253,124 @@
         "RestaurantSlug": "pista-house-suchitra",
         "Items": [
             {
-                "Name": "Chicken Biryani",
-                "Description": "Authentic Hyderabadi dum biryani with tender chicken",
-                "Price": 380.00,
-                "Category": "Main Course",
+                "Name": "Chicken Dum Biryani",
+                "Description": "Authentic Hyderabadi dum biryani slow-cooked with tender chicken and aromatic basmati rice",
+                "Price": 350.00,
+                "Category": "Biryani",
                 "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+            },
+            {
+                "Name": "Mutton Dum Biryani",
+                "Description": "Rich Hyderabadi mutton biryani with succulent pieces of goat meat",
+                "Price": 450.00,
+                "Category": "Biryani",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+            },
+            {
+                "Name": "Egg Biryani",
+                "Description": "Flavorful egg biryani with boiled eggs and fragrant rice",
+                "Price": 280.00,
+                "Category": "Biryani",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+            },
+            {
+                "Name": "Veg Dum Biryani",
+                "Description": "Vegetarian biryani with mixed vegetables and aromatic spices",
+                "Price": 250.00,
+                "Category": "Biryani",
+                "IsVegetarian": true,
+                "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
             },
             {
                 "Name": "Mutton Haleem",
-                "Description": "Rich, slow-cooked meat and wheat porridge",
-                "Price": 250.00,
+                "Description": "Pista House's legendary slow-cooked haleem with wheat, mutton and lentils - Ramadan specialty available year-round",
+                "Price": 380.00,
                 "Category": "Specialties",
                 "IsVegetarian": false,
+                "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800"
             },
             {
+                "Name": "Chicken 65",
+                "Description": "Spicy deep-fried chicken bites tossed with curry leaves and red chillies",
+                "Price": 320.00,
+                "Category": "Starters",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1610057099443-fde6c99db8c1?w=800"
+            },
+            {
+                "Name": "Chicken Lollipop",
+                "Description": "Crispy fried chicken drumettes with spicy chilli sauce",
+                "Price": 350.00,
+                "Category": "Starters",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1610057099443-fde6c99db8c1?w=800"
+            },
+            {
+                "Name": "Tandoori Chicken (Full)",
+                "Description": "Whole chicken marinated in yogurt and spices, roasted in tandoor",
+                "Price": 420.00,
+                "Category": "Kebabs",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800"
+            },
+            {
+                "Name": "Seekh Kebab",
+                "Description": "Minced mutton kebabs grilled on skewers with aromatic spices",
+                "Price": 380.00,
+                "Category": "Kebabs",
+                "IsVegetarian": false,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800"
+            },
+            {
+                "Name": "Double Ka Meetha",
+                "Description": "Traditional Hyderabadi bread pudding with condensed milk and dry fruits",
+                "Price": 120.00,
+                "Category": "Desserts",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800"
+            },
+            {
+                "Name": "Qubani Ka Meetha",
+                "Description": "Dried apricot dessert topped with cream - royal Nizami sweet",
+                "Price": 140.00,
+                "Category": "Desserts",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800"
+            },
+            {
                 "Name": "Zafrani Chai",
-                "Description": "Saffron-infused tea",
+                "Description": "Aromatic saffron-infused tea with cardamom",
                 "Price": 60.00,
                 "Category": "Beverages",
                 "IsVegetarian": true,
+                "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1544054468-b7d2f414cb53?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=800"
             }
         ]
     }
