@@ -22,11 +22,11 @@
     {
         "Slug": "rameshwaram-cafe-madhapur",
         "Name": "The Rameshwaram Cafe",
-        "Description": "Authentic South Indian Quick Service Restaurant serving premium Ghee Podi Dosa.",
+        "Description": "Authentic South Indian cuisine with crispy dosas, fluffy idlis, vadas, uttapams, and traditional filter coffee. Signature Ghee Pudi Dosa and Ghee Pudi Idli are crowd favorites. Official site: therameshwaram.cafe",
         "OwnerEmail": "admin@example.com",
-        "CuisineTypes": ["South Indian", "Quick Bites"],
+        "CuisineTypes": ["South Indian", "Dosa", "Idli", "Filter Coffee", "Vegetarian"],
         "Address": {
-            "Street": "Madhapur",
+            "Street": "1-98/4/14, Sy No. 72, Capital Pk Rd, beside Jain Sadguru Capital Park, Cyber Hills Colony, VIP Hills, Jaihind Enclave, Madhapur",
             "City": "Hyderabad",
             "State": "TG",
             "PostalCode": "500081",

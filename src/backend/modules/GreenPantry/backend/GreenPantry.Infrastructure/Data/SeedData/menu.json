@@ -128,9 +128,9 @@
         "RestaurantSlug": "rameshwaram-cafe-madhapur",
         "Items": [
             {
-                "Name": "Ghee Podi Dosa",
-                "Description": "Crispy dosa generously topped with spicy podi powder and melted ghee - the signature bestseller",
-                "Price": 160.00,
+                "Name": "Ghee Pudi Masala Dosa",
+                "Description": "Signature crispy dosa with potato masala, generous ghee and spicy pudi powder - the #1 bestseller",
+                "Price": 219.00,
                 "Category": "Dosa",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -138,9 +138,9 @@
                 "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
             },
             {
-                "Name": "Ghee Podi Masala Dosa",
-                "Description": "Masala dosa with potato filling, ghee and spicy podi powder",
-                "Price": 190.00,
+                "Name": "Ghee Pudi Dosa",
+                "Description": "Crispy dosa generously topped with spicy pudi powder and melted ghee",
+                "Price": 179.00,
                 "Category": "Dosa",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -149,8 +149,8 @@
             },
             {
                 "Name": "Benne Masala Dosa",
-                "Description": "Karnataka style butter masala dosa with crispy edges",
-                "Price": 170.00,
+                "Description": "Karnataka-style butter masala dosa with crispy golden edges and potato filling",
+                "Price": 189.00,
                 "Category": "Dosa",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -158,9 +158,39 @@
                 "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
             },
             {
-                "Name": "Ghee Podi Idli",
-                "Description": "Soft steamed idlis tossed in spicy podi and fragrant ghee",
-                "Price": 100.00,
+                "Name": "Ghee Onion Dosa",
+                "Description": "Crispy ghee dosa topped with caramelized onions",
+                "Price": 169.00,
+                "Category": "Dosa",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Neer Dosa",
+                "Description": "Light, lacy rice crepe - traditional Mangalorean style, served with coconut chutney",
+                "Price": 139.00,
+                "Category": "Dosa",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Garlic Roast Dosa",
+                "Description": "Extra crispy roast dosa with garlic butter and spicy chutney",
+                "Price": 199.00,
+                "Category": "Dosa",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Ghee Pudi Idli",
+                "Description": "Soft steamed idlis tossed in aromatic spicy pudi and fragrant ghee - signature item",
+                "Price": 158.00,
                 "Category": "Idli",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -168,19 +198,19 @@
                 "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
             },
             {
-                "Name": "Sambar Button Idli",
-                "Description": "Mini button idlis dunked in hot spicy sambar",
-                "Price": 120.00,
+                "Name": "Ghee Sambar Button Idli",
+                "Description": "Mini button idlis dunked in hot spicy sambar with ghee drizzle",
+                "Price": 149.00,
                 "Category": "Idli",
                 "IsVegetarian": true,
-                "IsVegan": true,
+                "IsVegan": false,
                 "IsAvailable": true,
                 "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
             },
             {
                 "Name": "Bangalore Idli",
                 "Description": "Classic Bangalore-style soft idlis served with coconut chutney and sambar",
-                "Price": 80.00,
+                "Price": 79.00,
                 "Category": "Idli",
                 "IsVegetarian": true,
                 "IsVegan": true,
@@ -188,9 +218,19 @@
                 "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
             },
             {
-                "Name": "Medu Vada",
-                "Description": "Crispy urad dal vada served with sambar and chutney",
-                "Price": 90.00,
+                "Name": "Butter Idli",
+                "Description": "Soft steamed idlis served with a generous pat of butter",
+                "Price": 89.00,
+                "Category": "Idli",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Uddina Vada",
+                "Description": "Crispy golden urad dal vada served with sambar and coconut chutney",
+                "Price": 89.00,
                 "Category": "Vada",
                 "IsVegetarian": true,
                 "IsVegan": true,
@@ -198,9 +238,59 @@
                 "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
             },
             {
+                "Name": "Ghee Paddu",
+                "Description": "Round, pan-fried rice and lentil dumplings with ghee - a Rameshwaram special",
+                "Price": 129.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Onion Uttapam",
+                "Description": "Thick rice pancake topped with chopped onions and served with chutney",
+                "Price": 139.00,
+                "Category": "Uttapam",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Podi Masala Uttapam",
+                "Description": "Uttapam with potato masala filling and spicy podi dusting",
+                "Price": 159.00,
+                "Category": "Uttapam",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800"
+            },
+            {
+                "Name": "Punugulu",
+                "Description": "Deep-fried crispy rice and lentil fritters served with spicy chutney",
+                "Price": 99.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=800"
+            },
+            {
+                "Name": "Aloo Bonda",
+                "Description": "Spiced potato balls dipped in gram flour batter and deep fried",
+                "Price": 89.00,
+                "Category": "Snacks",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=800"
+            },
+            {
                 "Name": "Ven Pongal",
-                "Description": "Creamy rice and moong dal pongal tempered with pepper and cumin",
-                "Price": 110.00,
+                "Description": "Creamy rice and moong dal pongal tempered with pepper, cumin, and cashews",
+                "Price": 119.00,
                 "Category": "Rice",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -209,8 +299,28 @@
             },
             {
                 "Name": "Bisi Bele Bath",
-                "Description": "Karnataka-style spicy lentil rice with vegetables and special masala",
-                "Price": 130.00,
+                "Description": "Karnataka-style spicy lentil rice with vegetables and aromatic Bisi Bele masala",
+                "Price": 139.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
+                "Name": "Puliyogare",
+                "Description": "Tangy tamarind rice with roasted peanuts and traditional spice paste",
+                "Price": 119.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
+                "Name": "Chitranna",
+                "Description": "Lemon rice with turmeric, peanuts, and mustard seeds",
+                "Price": 109.00,
                 "Category": "Rice",
                 "IsVegetarian": true,
                 "IsVegan": true,
@@ -219,8 +329,18 @@
             },
             {
                 "Name": "Curd Rice",
-                "Description": "Comforting yogurt rice tempered with mustard seeds and curry leaves",
-                "Price": 100.00,
+                "Description": "Comforting yogurt rice tempered with mustard seeds, curry leaves, and pomegranate",
+                "Price": 109.00,
+                "Category": "Rice",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800"
+            },
+            {
+                "Name": "Khara Bath",
+                "Description": "Spiced semolina upma with vegetables, cashews, and mustard tempering",
+                "Price": 99.00,
                 "Category": "Rice",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -229,8 +349,8 @@
             },
             {
                 "Name": "Filter Coffee",
-                "Description": "Authentic South Indian filter coffee with frothy milk",
-                "Price": 90.00,
+                "Description": "Authentic South Indian filter coffee brewed fresh with decoction and frothy milk",
+                "Price": 89.00,
                 "Category": "Beverages",
                 "IsVegetarian": true,
                 "IsVegan": false,
@@ -239,8 +359,8 @@
             },
             {
                 "Name": "Kesari Bath",
-                "Description": "Sweet semolina dessert flavored with saffron and ghee",
-                "Price": 80.00,
+                "Description": "Sweet semolina dessert flavored with saffron, ghee, and cashew nuts",
+                "Price": 89.00,
                 "Category": "Desserts",
                 "IsVegetarian": true,
                 "IsVegan": false,
