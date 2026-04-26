@@ -22,6 +22,7 @@ Serilog.Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     // Global log file
     .WriteTo.File("Logs/all-brands/log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.Console()
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -135,8 +136,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseMiddleware<TenantMiddleware>();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.UseRateLimiter();
 

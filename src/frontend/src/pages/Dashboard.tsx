@@ -42,7 +42,17 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const visibleBrands = useMemo(() => Array.from(new Map(brands.filter((b) => b.isVisible && b.tenantId !== 'rajeev-pvt').map((b) => [b.tenantId, b])).values()).sort((a, b) => (a.sortOrder - b.sortOrder) || a.name.localeCompare(b.name)), [brands]);
+  const visibleBrands = useMemo(() => {
+    return Array.from(new Map(brands.filter((b) => b.isVisible && b.tenantId !== 'rajeev-pvt').map((b) => [b.tenantId, b])).values())
+      .sort((a, b) => (a.sortOrder - b.sortOrder) || a.name.localeCompare(b.name));
+  }, [brands]);
+
+  const liveBrandCount = useMemo(() => {
+    return visibleBrands.filter(b => {
+      const config = parseConfig(b.configJson);
+      return config.status !== 'coming_soon' && b.tenantId !== 'morebrands';
+    }).length;
+  }, [visibleBrands]);
 
   const openBrand = (brand: Brand) => {
     const config = parseConfig(brand.configJson);
@@ -61,9 +71,9 @@ export default function Dashboard() {
           <h1>Multi-brand dashboard for one shared SaaS platform.</h1>
           <p>`/` is now the launch page for GreenPantry, Omega Technologies, BangaruKottu, VanaVajram, VajraValli, and future brands. Each live tile opens its own domain in a new tab.</p>
           <div className="hero-stats">
-            <div><strong>{visibleBrands.length}</strong><span>Brands</span></div>
-            <div><strong>MultiTenantSaaS_DB_PRDDB</strong><span>Shared DB</span></div>
-            <div><strong>EF Core</strong><span>Code First</span></div>
+            <div><strong>{liveBrandCount}</strong><span>Brands</span></div>
+            {/* <div><strong>MultiTenantSaaS_DB_PRDDB</strong><span>Shared DB</span></div> */}
+            {/* <div><strong>EF Core</strong><span>Code First</span></div> */}
           </div>
         </div>
         <div className="hero-art">

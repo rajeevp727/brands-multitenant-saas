@@ -126,6 +126,12 @@ public static class DbInitializer
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='RoleId') THEN
                         ALTER TABLE ""Users"" ADD COLUMN ""RoleId"" UUID;
                     END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='UpdatedAt') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""UpdatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+                    END IF;
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='IsActive') THEN
+                        ALTER TABLE ""Users"" ADD COLUMN ""IsActive"" BOOLEAN DEFAULT TRUE;
+                    END IF;
                     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Users' AND column_name='Role') THEN
                         ALTER TABLE ""Users"" ADD COLUMN ""Role"" INTEGER DEFAULT 0;
                     END IF;
@@ -376,18 +382,21 @@ public static class DbInitializer
             }
             await context.SaveChangesAsync();
 
-            // 2. Seed Roles
-            if (!await context.Roles.AnyAsync())
+            // 2. Seed Roles for all tenants
+            var allTenants = await context.Tenants.ToListAsync();
+            foreach (var tenant in allTenants)
             {
-                var roles = new List<Role>
+                var tenantRoles = new[] { "Admin", "User", "Customer" };
+                foreach (var roleName in tenantRoles)
                 {
-                    new Role { Name = "Admin", TenantId = "rajeev-pvt" },
-                    new Role { Name = "User", TenantId = "rajeev-pvt" }
-                };
-                await context.Roles.AddRangeAsync(roles);
-                await context.SaveChangesAsync();
-                logger.LogInformation("Seeded Default Roles.");
+                    if (!await context.Roles.IgnoreQueryFilters().AnyAsync(r => r.Name == roleName && r.TenantId == tenant.Id))
+                    {
+                        await context.Roles.AddAsync(new Role { Name = roleName, TenantId = tenant.Id });
+                        logger.LogInformation($"Seeded Role: {roleName} for Tenant: {tenant.Id}");
+                    }
+                }
             }
+            await context.SaveChangesAsync();
 
             // 3. Seed Admin User
             var existingAdmin = await context.Users

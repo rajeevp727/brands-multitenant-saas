@@ -1,12 +1,10 @@
+import { Analytics } from '@vercel/analytics/react';
 import { CssBaseline } from '@mui/material';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import SplashScreen from './components/common/SplashScreen';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
-import LoginPage from './pages/LoginPage';
-import AuthCallback from './pages/AuthCallback';
-import SignupPage from './pages/SignupPage';
 import MarkdownPage from './pages/MarkdownPage';
 import { BrandProvider } from './providers/BrandProvider';
 import { useBrand } from './providers/BrandContext';
@@ -32,14 +30,12 @@ const AppContent = () => {
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/signup" element={<SignupPage />} />
             <Route path="/privacy" element={<MarkdownPage title="Privacy Policy" type="privacy" />} />
             <Route path="/terms" element={<MarkdownPage title="Terms of Service" type="terms" />} />
             <Route path="/support" element={<MarkdownPage title="Help & Support" type="support" />} />
           </Routes>
         </Layout>
+        <Analytics />
       </BrowserRouter>
     </ThemeProvider>
   );

@@ -22,7 +22,8 @@ public class AnalyticsControllerTests
             .Options;
             
         var mockTenantProvider = new Mock<ITenantProvider>();
-        _context = new ApplicationDbContext(options, mockTenantProvider.Object);
+        var mockUserContext = new Mock<IUserContext>();
+        _context = new ApplicationDbContext(options, mockTenantProvider.Object, mockUserContext.Object);
         _controller = new AnalyticsController(_context);
     }
 

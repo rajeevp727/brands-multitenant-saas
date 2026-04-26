@@ -22,6 +22,7 @@ public class AuthServiceExtendedTests
     private readonly Mock<IJwtProvider> _mockJwtProvider;
     private readonly Mock<ILogger<AuthService>> _mockLogger;
     private readonly Mock<IConfiguration> _mockConfig;
+    private readonly Mock<ITenantProvider> _mockTenantProvider;
     private readonly TestDataBuilder _builder;
     private readonly AuthService _authService;
 
@@ -31,13 +32,15 @@ public class AuthServiceExtendedTests
         _mockJwtProvider = new Mock<IJwtProvider>();
         _mockLogger = new Mock<ILogger<AuthService>>();
         _mockConfig = new Mock<IConfiguration>();
+        _mockTenantProvider = new Mock<ITenantProvider>();
         _builder = new TestDataBuilder();
 
         _authService = new AuthService(
             _mockUnitOfWork.Object,
             _mockJwtProvider.Object,
             _mockLogger.Object,
-            _mockConfig.Object
+            _mockConfig.Object,
+            _mockTenantProvider.Object
         );
     }
 

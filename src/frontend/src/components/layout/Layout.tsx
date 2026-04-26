@@ -29,11 +29,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-.02em', color: brand.primaryColor }}>{title}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {user && !isMobile && <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.username || user.email?.split('@')[0]}</Typography>}
             {isMobile && <IconButton onClick={() => { window.location.href = '/'; }} size="small"><HomeIcon fontSize="small" /></IconButton>}
             {isMobile && <IconButton onClick={toggleColorMode} size="small">{mode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}</IconButton>}
             <NotificationBell />
-            {user && isMobile && <IconButton onClick={logout} size="small"><LogoutIcon sx={{ fontSize: 20 }} /></IconButton>}
           </Box>
         </Box>
         <Box sx={{ flexGrow: 1, pb: { xs: 8, md: 10 } }}>{children}</Box>

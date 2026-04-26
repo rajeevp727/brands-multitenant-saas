@@ -1,0 +1,101 @@
+[
+    {
+        "RestaurantSlug": "cafe-niloufer-himayatnagar",
+        "Items": [
+            {
+                "Name": "Irani Chai",
+                "Description": "Authentic Hyderabadi special Irani Chai",
+                "Price": 30.00,
+                "Category": "Beverages",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?w=800"
+            },
+            {
+                "Name": "Bun Maska",
+                "Description": "Fresh bun sliced and filled with butter maska",
+                "Price": 50.00,
+                "Category": "Bakery",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=800"
+            },
+            {
+                "Name": "Osmania Biscuit",
+                "Description": "Classic buttery Osmania Biscuits",
+                "Price": 20.00,
+                "Category": "Bakery",
+                "IsVegetarian": true,
+                "IsVegan": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "rameshwaram-cafe-madhapur",
+        "Items": [
+            {
+                "Name": "Ghee Podi Dosa",
+                "Description": "Crispy dosa topped with spicy podi and generous amounts of ghee",
+                "Price": 150.00,
+                "Category": "South Indian",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800"
+            },
+            {
+                "Name": "Ghee Podi Idli",
+                "Description": "Soft idlis soaked in podi and ghee",
+                "Price": 120.00,
+                "Category": "South Indian",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+            },
+            {
+                "Name": "Filter Coffee",
+                "Description": "Authentic South Indian filter coffee",
+                "Price": 45.00,
+                "Category": "Beverages",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1616259020948-261bd7faafec?w=800"
+            }
+        ]
+    },
+    {
+        "RestaurantSlug": "pista-house-suchitra",
+        "Items": [
+            {
+                "Name": "Chicken Biryani",
+                "Description": "Authentic Hyderabadi dum biryani with tender chicken",
+                "Price": 380.00,
+                "Category": "Main Course",
+                "IsVegetarian": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+            },
+            {
+                "Name": "Mutton Haleem",
+                "Description": "Rich, slow-cooked meat and wheat porridge",
+                "Price": 250.00,
+                "Category": "Specialties",
+                "IsVegetarian": false,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800"
+            },
+            {
+                "Name": "Zafrani Chai",
+                "Description": "Saffron-infused tea",
+                "Price": 60.00,
+                "Category": "Beverages",
+                "IsVegetarian": true,
+                "IsAvailable": true,
+                "ImageUrl": "https://images.unsplash.com/photo-1544054468-b7d2f414cb53?w=800"
+            }
+        ]
+    }
+]

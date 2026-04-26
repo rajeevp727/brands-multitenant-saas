@@ -19,6 +19,7 @@ public class AuthServiceTests
     private readonly Mock<IJwtProvider> _mockJwtProvider;
     private readonly Mock<ILogger<AuthService>> _mockLogger;
     private readonly Mock<IConfiguration> _mockConfiguration;
+    private readonly Mock<ITenantProvider> _mockTenantProvider;
     private readonly TestDataBuilder _dataBuilder;
     private readonly AuthService _authService;
 
@@ -28,13 +29,15 @@ public class AuthServiceTests
         _mockJwtProvider = new Mock<IJwtProvider>();
         _mockLogger = new Mock<ILogger<AuthService>>();
         _mockConfiguration = new Mock<IConfiguration>();
+        _mockTenantProvider = new Mock<ITenantProvider>();
         _dataBuilder = new TestDataBuilder();
 
         _authService = new AuthService(
             _mockUnitOfWork.Object,
             _mockJwtProvider.Object,
             _mockLogger.Object,
-            _mockConfiguration.Object
+            _mockConfiguration.Object,
+            _mockTenantProvider.Object
         );
     }
 
@@ -292,6 +295,6 @@ public class AuthServiceTests
         var result = _authService.GetFrontendRedirectUrl(token, email);
 
         // Assert
-        result.Should().Be($"https://rajeevs-pvt-ltd.vercel.app/auth/callback?token={token}&email={email}");
+        result.Should().Be($"https://rajeevs-pvt-ltd.vercel.app/auth/callback?email={email}");
     }
 }

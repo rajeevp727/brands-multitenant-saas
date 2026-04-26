@@ -22,14 +22,44 @@ interface User {
  * Calculates the base URL for a brand based on portalUrl, configJson and port.
  */
 export const calculateBaseUrl = (brand: BrandData): string => {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const config = JSON.parse(brand.configJson || '{}');
 
-    // ✅ 1. ALWAYS DB URL FIRST
-    if (config.url) {
+    // 🚀 LOCAL DEVELOPMENT OVERRIDES
+    if (isLocal) {
+        // If a specific port is provided in brand data or config
+        const port = brand.port || config.port;
+        if (port) return `http://localhost:${port}/`;
+
+        // Hardcoded development mappings based on tenantId
+        const localPorts: Record<string, string> = {
+            'greenpantry': '5174',
+            'omega': '5175',
+            'bangaru': '5176'
+        };
+
+        if (localPorts[brand.tenantId]) {
+            return `http://localhost:${localPorts[brand.tenantId]}/`;
+        }
+
+        // Fallback to localhost URL if it already exists in config
+        if (config.url?.includes('localhost')) {
+            return config.url.endsWith('/') ? config.url : config.url + '/';
+        }
+    }
+
+    // 🌍 PRODUCTION RESOLUTION
+    // ✅ 1. ALWAYS DB URL FIRST (if it's not a localhost URL in a production environment)
+    if (config.url && (!isLocal || !config.url.includes('localhost'))) {
         return config.url.endsWith('/') ? config.url : config.url + '/';
     }
 
-    // ✅ 2. portalUrl fallback
+    // ✅ 2. domain fallback from config
+    if (config.domain) {
+        return `https://${config.domain}/`;
+    }
+
+    // ✅ 3. portalUrl fallback
     if (brand.portalUrl) {
         let url = brand.portalUrl;
         if (!url.startsWith('http')) {

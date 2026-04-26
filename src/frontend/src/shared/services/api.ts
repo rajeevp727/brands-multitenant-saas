@@ -70,17 +70,7 @@ api.interceptors.response.use(
     response => response,
     (error: AxiosError) => {
         if (error.response?.status === 401) {
-            const currentPath = window.location.pathname;
-
-            // Prevent infinite redirect loop
-            if (currentPath !== "/login") {
-                console.warn("Unauthorized - redirecting to login");
-
-                localStorage.removeItem("user");
-                localStorage.removeItem("access_token");
-
-                window.location.href = "/login";
-            }
+            console.warn("Unauthorized API call detected");
         }
 
         return Promise.reject(error);

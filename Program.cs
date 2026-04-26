@@ -8,8 +8,8 @@ Console.WriteLine("🚀 Starting Multi-Tenant SaaS APIs...");
 var apis = new[]
 {
     new { Name = "SaaS-API", Path = "src/backend/SaaS.Api" },
-    new { Name = "GP-API", Path = "modules/GreenPantry/backend/GreenPantry.API" },
-    new { Name = "BK-API", Path = "modules/BangaruKottu/backend/Vendor.API" }
+    new { Name = "GP-API", Path = "src/backend/modules/GreenPantry/backend/GreenPantry.API" },
+    new { Name = "BK-API", Path = "src/backend/modules/BangaruKottu/backend/Vendor.API" }
 };
 
 var processes = new List<Process>();

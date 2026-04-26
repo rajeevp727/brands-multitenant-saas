@@ -23,13 +23,16 @@ public class AuthService : IAuthService
     private readonly IJwtProvider _jwtProvider;
     private readonly Microsoft.Extensions.Logging.ILogger<AuthService> _logger;
     private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+    private readonly ITenantProvider _tenantProvider;
 
-    public AuthService(IUnitOfWork unitOfWork, IJwtProvider jwtProvider, Microsoft.Extensions.Logging.ILogger<AuthService> logger, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public AuthService(IUnitOfWork unitOfWork, IJwtProvider jwtProvider, Microsoft.Extensions.Logging.ILogger<AuthService> logger, 
+    Microsoft.Extensions.Configuration.IConfiguration configuration, ITenantProvider tenantProvider)
     {
         _unitOfWork = unitOfWork;
         _jwtProvider = jwtProvider;
         _logger = logger;
         _configuration = configuration;
+        _tenantProvider = tenantProvider;
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -204,10 +207,24 @@ public class AuthService : IAuthService
         {
             try
             {
+                var tenantId = _tenantProvider.GetTenantId() ?? "rajeev-pvt";
                 var role = await _unitOfWork.Repository<Role>().GetQueryable()
-                    .FirstOrDefaultAsync(r => r.Name == "Customer");
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(r => (r.Name == "Customer" || r.Name == "User") && r.TenantId == tenantId);
 
-                // Ensure name/username is not empty
+                if (role == null)
+                {
+                    // Fallback to any active tenant role if specialized ones are missing
+                    role = await _unitOfWork.Repository<Role>().GetQueryable()
+                        .IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(r => r.TenantId == tenantId);
+                }
+
+                if (role == null)
+                {
+                    throw new Exception($"Default role 'Customer' or 'User' not found for tenant '{tenantId}'");
+                }
+
                 var username = !string.IsNullOrWhiteSpace(name) ? name : email.Split('@')[0];
 
                 user = new User
@@ -220,11 +237,11 @@ public class AuthService : IAuthService
                     PasswordHash = "EXTERNAL_AUTH",
                     RoleId = role?.Id,
                     IsActive = true,
-                    TenantId = "rajeev-pvt", // Default to main tenant for external users
+                    IsEmailVerified = true,
+                    TenantId = tenantId,
                     CreatedBy = "GoogleOAuth",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    IsEmailVerified = true, // Email verified through OAuth provider
                     IsDeleted = false
                 };
 

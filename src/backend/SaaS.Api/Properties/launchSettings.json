@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
+      "launchUrl": "/swagger",
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
@@ -12,6 +13,7 @@
     },
     "https": {
       "commandName": "Project",
+      "launchUrl": "/swagger",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7002;http://localhost:5114",

@@ -1,0 +1,62 @@
+[
+    {
+        "Slug": "cafe-niloufer-himayatnagar",
+        "Name": "Cafe Niloufer",
+        "Description": "Popular spot for Hyderabadi chai, bun maska, and bakery items.",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": ["Bakery", "Cafe", "Indian"],
+        "Address": {
+            "Street": "Himayatnagar",
+            "City": "Hyderabad",
+            "State": "TG",
+            "PostalCode": "500029",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.6,
+        "ReviewCount": 540,
+        "EstimatedDeliveryTime": 25,
+        "DeliveryFee": 30,
+        "ImageUrl": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800"
+    },
+    {
+        "Slug": "rameshwaram-cafe-madhapur",
+        "Name": "The Rameshwaram Cafe",
+        "Description": "Authentic South Indian Quick Service Restaurant serving premium Ghee Podi Dosa.",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": ["South Indian", "Quick Bites"],
+        "Address": {
+            "Street": "Madhapur",
+            "City": "Hyderabad",
+            "State": "TG",
+            "PostalCode": "500081",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.8,
+        "ReviewCount": 1200,
+        "EstimatedDeliveryTime": 20,
+        "DeliveryFee": 40,
+        "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+    },
+    {
+        "Slug": "pista-house-suchitra",
+        "Name": "Pista House",
+        "Description": "Famous chain known for authentic Hyderabadi Biryani, Haleem, and sweet treats.",
+        "OwnerEmail": "admin@example.com",
+        "CuisineTypes": ["Hyderabadi", "Indian", "Bakery"],
+        "Address": {
+            "Street": "Suchitra Circle, Jeedimetla",
+            "City": "Hyderabad",
+            "State": "TG",
+            "PostalCode": "500055",
+            "Country": "India"
+        },
+        "IsActive": true,
+        "Rating": 4.5,
+        "ReviewCount": 850,
+        "EstimatedDeliveryTime": 35,
+        "DeliveryFee": 50,
+        "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+    }
+]

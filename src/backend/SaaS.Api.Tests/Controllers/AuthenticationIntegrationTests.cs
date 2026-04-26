@@ -24,7 +24,7 @@ public class AuthenticationIntegrationTests
     {
         _mockAuthService = new Mock<IAuthService>();
         _mockEnv = new Mock<IWebHostEnvironment>();
-        _mockEnv.Setup(e => e.IsDevelopment()).Returns(true);
+        _mockEnv.Setup(e => e.EnvironmentName).Returns("Development");
         
         _controller = new AuthController(_mockAuthService.Object, _mockEnv.Object);
         

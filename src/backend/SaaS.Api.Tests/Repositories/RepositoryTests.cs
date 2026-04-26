@@ -22,8 +22,9 @@ public class RepositoryTests
 
         var mockTenantProvider = new Mock<ITenantProvider>();
         mockTenantProvider.Setup(p => p.GetTenantId()).Returns("test-tenant");
-
-        _context = new ApplicationDbContext(options, mockTenantProvider.Object);
+        
+        var mockUserContext = new Mock<IUserContext>();
+        _context = new ApplicationDbContext(options, mockTenantProvider.Object, mockUserContext.Object);
         _unitOfWork = new UnitOfWork(_context);
     }
 
