@@ -5,7 +5,6 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import { AuthProvider } from '../shared/providers/AuthProvider';
-import { BrandProvider } from '../providers/BrandContext';
 
 // Mock the auth service
 vi.mock('../services/authService', () => ({
@@ -20,11 +19,9 @@ describe('Login UI Test Cases', () => {
     const renderLoginPage = (props = {}) => {
         return render(
             <BrowserRouter>
-                <BrandProvider>
                     <AuthProvider>
                         <LoginPage {...props} />
                     </AuthProvider>
-                </BrandProvider>
             </BrowserRouter>
         );
     };
@@ -285,7 +282,7 @@ describe('Login UI Test Cases', () => {
 
             // Mock window.location.href
             delete (window as any).location;
-            window.location = { href: '' } as Location;
+            window.location = { href: '', assign: vi.fn(), replace: vi.fn() } as unknown as Location;
 
             fireEvent.click(googleButton);
 
@@ -300,7 +297,7 @@ describe('Login UI Test Cases', () => {
 
             // Mock window.location.href
             delete (window as any).location;
-            window.location = { href: '' } as Location;
+            window.location = { href: '', assign: vi.fn(), replace: vi.fn() } as unknown as Location;
 
             fireEvent.click(facebookButton);
 
@@ -312,8 +309,8 @@ describe('Login UI Test Cases', () => {
     describe('Responsive Design', () => {
         it('TC-UI-023: should be responsive on mobile devices', () => {
             // Set viewport to mobile size
-            global.innerWidth = 375;
-            global.innerHeight = 667;
+            Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+            Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 667 });
 
             renderLoginPage();
 
@@ -325,8 +322,8 @@ describe('Login UI Test Cases', () => {
         });
 
         it('TC-UI-024: should be responsive on tablet devices', () => {
-            global.innerWidth = 768;
-            global.innerHeight = 1024;
+            Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 768 });
+            Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 1024 });
 
             renderLoginPage();
 
@@ -337,8 +334,8 @@ describe('Login UI Test Cases', () => {
         });
 
         it('TC-UI-025: should be responsive on desktop devices', () => {
-            global.innerWidth = 1920;
-            global.innerHeight = 1080;
+            Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1920 });
+            Object.defineProperty(window, 'innerHeight', { writable: true, configurable: true, value: 1080 });
 
             renderLoginPage();
 

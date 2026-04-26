@@ -69,6 +69,15 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
                 Near Me
               </Link>
             </li>
+            <li>
+              <Link
+                to="/favorites"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium flex items-center gap-2"
+                onClick={onClose}
+              >
+                My Favorites
+              </Link>
+            </li>
           </ul>
         )}
       </div>
@@ -106,15 +115,6 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
                     onClick={onClose}
                   >
                     Order History
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/favorites"
-                    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                    onClick={onClose}
-                  >
-                    Favorites
                   </Link>
                 </li>
                 <li>

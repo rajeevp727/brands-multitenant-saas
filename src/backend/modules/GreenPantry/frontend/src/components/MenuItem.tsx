@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Plus, Minus, ShoppingCart } from 'lucide-react'
+import { Plus, Minus, ShoppingCart, Heart } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
+import { useFavorites } from '../hooks/useFavorites'
 
 interface MenuItemProps {
   id: string
@@ -23,7 +24,10 @@ const MenuItem = ({
   restaurantId
 }: MenuItemProps) => {
   const { addItem } = useCart()
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites()
   const [quantity, setQuantity] = useState(1)
+
+  const isFav = isFavorite(id, 'dish');
 
   const handleAddToCart = () => {
     addItem({
@@ -62,7 +66,23 @@ const MenuItem = ({
           alt={name}
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-3 right-3 bg-primary-600 text-white px-2 py-1 rounded-full text-sm font-medium">
+        <div className="absolute top-3 left-3 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm z-10 hover:scale-110 transition-transform">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isFav) {
+                removeFavorite(id, 'dish');
+              } else {
+                addFavorite(id, 'dish');
+              }
+            }}
+            className={`p-2 transition-colors ${isFav ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+            title={isFav ? "Remove from Favorites" : "Add to Favorites"}
+          >
+            <Heart className="w-5 h-5" fill={isFav ? "currentColor" : "none"} />
+          </button>
+        </div>
+        <div className="absolute top-3 right-3 bg-primary-600 text-white px-2 py-1 rounded-full text-sm font-medium z-10">
           {category}
         </div>
       </div>
@@ -105,9 +125,9 @@ const MenuItem = ({
 
           <button
             onClick={handleAddToCart}
-            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors text-sm font-medium"
+            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-2 py-2 rounded-lg flex items-center justify-center space-x-1 transition-colors text-sm font-medium whitespace-nowrap"
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-4 h-4 shrink-0" />
             <span>Add to Cart</span>
           </button>
         </div>

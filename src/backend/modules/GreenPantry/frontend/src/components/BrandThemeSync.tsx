@@ -37,7 +37,7 @@ const BrandThemeSync = () => {
                 const hostname = window.location.hostname;
                 const tenantId = hostname === 'localhost' ? 'rajeev-pvt' : 'greenpantry';
 
-                const response = await fetch('http://localhost:5114/api/brands/current', {
+                const response = await fetch('/api/brands/current', {
                     headers: {
                         'X-Tenant-Id': tenantId
                     }

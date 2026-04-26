@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
         return services;
     }

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, IconButton, Tooltip, useTheme, alpha } from '@mui/material';
-import { HomeRounded as HomeIcon, Login as LoginIcon, Logout as LogoutIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Brightness4, Brightness7 } from '@mui/icons-material';
+import { HomeRounded as HomeIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Brightness4, Brightness7 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../shared/providers/AuthContext';
 import { useColorMode } from '../../providers/ThemeContext';
@@ -9,7 +9,6 @@ const drawerWidth = 260;
 const collapsedWidth = 70;
 
 export default function LeftSidebar({ open, collapsed, onClose, onToggleCollapse, variant = 'permanent' }: { open: boolean; collapsed: boolean; onClose: () => void; onToggleCollapse: () => void; variant?: 'permanent' | 'persistent' | 'temporary'; }) {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();

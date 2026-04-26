@@ -45,7 +45,7 @@ export const ResetPasswordPage: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:7001/api'}/auth/reset-password`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

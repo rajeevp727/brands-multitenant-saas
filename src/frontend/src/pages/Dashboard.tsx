@@ -88,7 +88,6 @@ export default function Dashboard() {
         {visibleBrands.map((brand, index) => {
           const config = parseConfig(brand.configJson);
           const comingSoon = config.status === 'coming_soon' || brand.tenantId === 'morebrands';
-          const target = brand.portalUrl || config.url || calculateBaseUrl(brand);
           return (
             <motion.button
               key={`${brand.tenantId}-${brand.id}-${index}`}

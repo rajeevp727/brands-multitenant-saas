@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<MenuItem> MenuItems { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Favorite> Favorites { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -127,6 +128,13 @@ public class AppDbContext : DbContext
                     (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.Count == c2.Count && !c1.Except(c2).Any()),
                     c => c == null ? 0 : c.Aggregate(0, (a, v) => HashCode.Combine(a, v.Key.GetHashCode(), v.Value.GetHashCode())),
                     c => c == null ? new Dictionary<string, object>() : new Dictionary<string, object>(c)));
+        });
+
+        // Configure Favorite
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.UserId, e.ItemId, e.ItemType }).IsUnique();
         });
     }
 }

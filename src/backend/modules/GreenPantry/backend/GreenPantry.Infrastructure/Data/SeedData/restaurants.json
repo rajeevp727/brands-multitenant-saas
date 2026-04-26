@@ -37,7 +37,7 @@
         "ReviewCount": 1200,
         "EstimatedDeliveryTime": 20,
         "DeliveryFee": 40,
-        "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+        "ImageUrl": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
     },
     {
         "Slug": "pista-house-suchitra",
@@ -57,6 +57,6 @@
         "ReviewCount": 850,
         "EstimatedDeliveryTime": 35,
         "DeliveryFee": 50,
-        "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+        "ImageUrl": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800"
     }
 ]

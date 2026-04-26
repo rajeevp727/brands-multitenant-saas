@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddHttpClient<IGeolocationService, GeolocationService>();
 
         // Add payment services

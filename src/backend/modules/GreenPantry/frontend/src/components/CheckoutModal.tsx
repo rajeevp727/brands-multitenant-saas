@@ -36,15 +36,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState<string>('')
 
-  // Address form state
   const [address, setAddress] = useState<DeliveryAddress>({
-    street: user?.address?.street || '',
-    city: user?.address?.city || '',
-    state: user?.address?.state || '',
-    postalCode: user?.address?.postalCode || '',
-    country: user?.address?.country || 'India',
-    latitude: user?.address?.latitude || 0,
-    longitude: user?.address?.longitude || 0
+    street: user?.streetAddress || '',
+    city: user?.city || '',
+    state: user?.state || '',
+    postalCode: user?.postalCode || '',
+    country: user?.country || 'India',
+    latitude: user?.latitude || 0,
+    longitude: user?.longitude || 0
   })
 
   // Calculate totals

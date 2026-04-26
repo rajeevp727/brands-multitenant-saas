@@ -30,7 +30,6 @@ import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
 import CookiesPage from './pages/CookiesPage'
 import RefundPage from './pages/RefundPage'
-import ProtectedRoute from './components/ProtectedRoute'
 import BrandThemeSync from './components/BrandThemeSync'
 
 import { useThemeStore } from './store/themeStore'

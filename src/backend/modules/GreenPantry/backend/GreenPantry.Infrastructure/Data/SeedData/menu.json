@@ -1,6 +1,6 @@
 [
     {
-        "RestaurantSlug": "cafe-niloufer-himayatnagar",
+        "RestaurantSlug": "cafe-niloufer",
         "Items": [
             {
                 "Name": "Irani Chai",
@@ -50,7 +50,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800"
             },
             {
                 "Name": "Cheese Puff",
@@ -60,7 +60,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800"
             },
             {
                 "Name": "Aloo Samosa",
@@ -125,7 +125,7 @@
         ]
     },
     {
-        "RestaurantSlug": "rameshwaram-cafe-madhapur",
+        "RestaurantSlug": "the-rameshwaram-cafe",
         "Items": [
             {
                 "Name": "Ghee Pudi Masala Dosa",
@@ -195,7 +195,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Ghee Sambar Button Idli",
@@ -205,7 +205,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Bangalore Idli",
@@ -215,7 +215,7 @@
                 "IsVegetarian": true,
                 "IsVegan": true,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Butter Idli",
@@ -225,7 +225,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Uddina Vada",
@@ -235,7 +235,7 @@
                 "IsVegetarian": true,
                 "IsVegan": true,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Ghee Paddu",
@@ -245,7 +245,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1589301773012-07755f1a5bd8?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589227365533-dee630bb59bd?w=800"
             },
             {
                 "Name": "Onion Uttapam",
@@ -355,7 +355,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1616259020948-261bd7faafec?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=800"
             },
             {
                 "Name": "Kesari Bath",
@@ -370,7 +370,7 @@
         ]
     },
     {
-        "RestaurantSlug": "pista-house-suchitra",
+        "RestaurantSlug": "pista-house",
         "Items": [
             {
                 "Name": "Chicken Dum Biryani",
@@ -380,7 +380,7 @@
                 "IsVegetarian": false,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589302168068-964662d93d51?w=800"
             },
             {
                 "Name": "Mutton Dum Biryani",
@@ -390,7 +390,7 @@
                 "IsVegetarian": false,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589302168068-964662d93d51?w=800"
             },
             {
                 "Name": "Egg Biryani",
@@ -400,7 +400,7 @@
                 "IsVegetarian": false,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589302168068-964662d93d51?w=800"
             },
             {
                 "Name": "Veg Dum Biryani",
@@ -410,7 +410,7 @@
                 "IsVegetarian": true,
                 "IsVegan": false,
                 "IsAvailable": true,
-                "ImageUrl": "https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=800"
+                "ImageUrl": "https://images.unsplash.com/photo-1589302168068-964662d93d51?w=800"
             },
             {
                 "Name": "Mutton Haleem",

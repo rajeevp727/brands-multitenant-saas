@@ -14,7 +14,7 @@ export const ForgotPasswordPage: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:7001/api'}/auth/forgot-password`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

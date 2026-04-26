@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { Brightness4 as DarkModeIcon, Brightness7 as LightModeIcon, ExitToApp as LogoutIcon, Home as HomeIcon } from '@mui/icons-material';
+import { Brightness4 as DarkModeIcon, Brightness7 as LightModeIcon, Home as HomeIcon } from '@mui/icons-material';
 import Footer from './Footer';
 import LeftSidebar from './LeftSidebar';
 import NotificationBell from '../notifications/NotificationBell';
@@ -14,7 +14,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const { brand } = useBrand();
-  const { user, logout } = useAuth();
   const { mode, toggleColorMode } = useColorMode();
   const isCorporate = !brand?.id || brand.id === 'default' || brand.id === 'rajeev-pvt' || brand.name?.toLowerCase().includes('rajeev');
   const title = isCorporate ? "Rajeev's Tech" : brand.name;

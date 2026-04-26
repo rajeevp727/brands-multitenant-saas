@@ -6,8 +6,7 @@ import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import { apiService } from '../services/api'
 import { useAuthStore } from '../store/authStore'
-import { Order, User, Address } from '../types'
-import { UserRole } from '../types/enums'
+import { Order, User } from '../types'
 import { User as UserIcon, MapPin, Package, Settings, Navigation } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { AxiosError } from 'axios'
@@ -133,22 +132,6 @@ const ProfilePage = () => {
     },
   })
 
-  const updateAddressMutation = useMutation({
-    mutationFn: (address: Address) => apiService.updateAddress(address),
-    onSuccess: () => {
-      toast.success('Address updated successfully!')
-      // Invalidate and refetch profile data
-      queryClient.invalidateQueries({ queryKey: ['user-profile'] })
-      refetchProfile()
-    },
-    onError: (error: unknown) => {
-      const axiosError = error as AxiosError<{ message?: string }>
-      console.error('Address update error:', axiosError)
-      const errorMessage = axiosError.response?.data?.message ||
-        `Failed to update address (${axiosError.response?.status || 'Network Error'})`
-      toast.error(errorMessage)
-    },
-  })
 
   const onSubmit = (data: ProfileFormData) => {
     // Update profile - create a proper User object with all fields
