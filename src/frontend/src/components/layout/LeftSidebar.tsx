@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, IconButton, Tooltip, useTheme, alpha } from '@mui/material';
 import { HomeRounded as HomeIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Brightness4, Brightness7 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../shared/providers/AuthContext';
 import { useColorMode } from '../../providers/ThemeContext';
 
 const drawerWidth = 260;

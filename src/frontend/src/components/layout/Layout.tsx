@@ -5,7 +5,6 @@ import Footer from './Footer';
 import LeftSidebar from './LeftSidebar';
 import NotificationBell from '../notifications/NotificationBell';
 import { useBrand } from '../../providers/BrandContext';
-import { useAuth } from '../../shared/providers/AuthContext';
 import { useColorMode } from '../../providers/ThemeContext';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

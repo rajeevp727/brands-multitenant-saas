@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
@@ -282,6 +282,7 @@ describe('Login UI Test Cases', () => {
 
             // Mock window.location.href
             delete (window as any).location;
+            // @ts-ignore
             window.location = { href: '', assign: vi.fn(), replace: vi.fn() } as unknown as Location;
 
             fireEvent.click(googleButton);
@@ -297,6 +298,7 @@ describe('Login UI Test Cases', () => {
 
             // Mock window.location.href
             delete (window as any).location;
+            // @ts-ignore
             window.location = { href: '', assign: vi.fn(), replace: vi.fn() } as unknown as Location;
 
             fireEvent.click(facebookButton);

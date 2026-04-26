@@ -1,5 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import axios from 'axios';
+import { describe, it, expect } from 'vitest';
 
 // We test the interceptor logic by simulating what the response interceptor does,
 // because the actual axios instance is module-level and hard to reset per-test.
