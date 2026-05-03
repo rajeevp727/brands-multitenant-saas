@@ -24,9 +24,20 @@ interface User {
 export const calculateBaseUrl = (brand: BrandData): string => {
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const config = JSON.parse(brand.configJson || '{}');
+    const tenantId = (brand.tenantId || '').toLowerCase();
+
+    const isGreenPantry = tenantId === 'greenpantry';
+    const isOmega = tenantId === 'omega' || tenantId === 'omegatechnologies';
+    const isBangaru = tenantId === 'bangaru' || tenantId === 'bangarukottu';
+    const localPreviewUrl = `${window.location.origin}/brand-preview/${tenantId || 'default'}`;
 
     // 🚀 LOCAL DEVELOPMENT OVERRIDES
     if (isLocal) {
+        // Enforce local app routing for known brands while developing.
+        if (isGreenPantry) return 'http://localhost:5174/';
+        if (isOmega) return 'http://localhost:5175/';
+        if (isBangaru) return 'http://localhost:5176/';
+
         // If a specific port is provided in brand data or config
         const port = brand.port || config.port;
         if (port) return `http://localhost:${port}/`;
@@ -46,9 +57,16 @@ export const calculateBaseUrl = (brand: BrandData): string => {
         if (config.url?.includes('localhost')) {
             return config.url.endsWith('/') ? config.url : config.url + '/';
         }
+
+        // For brands that do not yet have a dedicated local app, use a local landing preview.
+        return localPreviewUrl;
     }
 
     // 🌍 PRODUCTION RESOLUTION
+    // Prefer explicit public domains for key brands in non-local environments.
+    if (isGreenPantry) return 'https://greenpantry.in/';
+    if (isOmega) return 'https://omega-technologes.in/';
+
     // ✅ 1. ALWAYS DB URL FIRST (if it's not a localhost URL in a production environment)
     if (config.url && (!isLocal || !config.url.includes('localhost'))) {
         return config.url.endsWith('/') ? config.url : config.url + '/';

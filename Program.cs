@@ -1,76 +1,149 @@
 using System.Diagnostics;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
-Console.WriteLine("🚀 Starting Multi-Tenant SaaS APIs...");
+Console.WriteLine("Starting Multi-Tenant SaaS orchestrator...");
 
-var apis = new[]
+var root = Directory.GetCurrentDirectory();
+var startedProcesses = new List<Process>();
+var isShuttingDown = false;
+
+var apiServices = new[]
 {
-    new { Name = "SaaS-API", Path = "src/backend/SaaS.Api" },
-    new { Name = "GP-API", Path = "src/backend/modules/GreenPantry/backend/GreenPantry.API" },
-    new { Name = "BK-API", Path = "src/backend/modules/BangaruKottu/backend/Vendor.API" }
+    new Service("SaaS-API", "src/backend/SaaS.Api", "dotnet run --urls http://0.0.0.0:5114"),
+    new Service("GreenPantry-API", "src/backend/modules/GreenPantry/backend/GreenPantry.API", "dotnet run --urls http://0.0.0.0:7001"),
+    new Service("BangaruKottu-API", "src/backend/modules/BangaruKottu/backend/Vendor.API", "dotnet run --urls http://0.0.0.0:7002")
 };
 
-var processes = new List<Process>();
-
-foreach (var api in apis)
+var uiServices = new[]
 {
-    var isMain = api.Name == "SaaS-API";
-    Console.WriteLine($"[Orchestrator] Launching {api.Name} {(isMain ? "(Focus)" : "(Background)")}...");
-    
-    var psi = new ProcessStartInfo
-    {
-        FileName = "dotnet",
-        Arguments = "run",
-        WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), api.Path),
-        UseShellExecute = isMain, 
-        CreateNoWindow = !isMain
-    };
+    new Service("SaaS-UI", "src/frontend", "npm run dev -- --port 5173"),
+    new Service("GreenPantry-UI", "src/backend/modules/GreenPantry/frontend", "npm run dev -- --port 5174"),
+    new Service("OmegaTech-UI", "src/backend/modules/OmegaTech", "npm run start"),
+    new Service("BangaruKottu-UI", "src/backend/modules/BangaruKottu/frontend", "npm run dev -- --port 5176")
+};
 
-    var process = Process.Start(psi);
-    if (process != null) processes.Add(process);
+Console.CancelKeyPress += (_, eventArgs) =>
+{
+    eventArgs.Cancel = true;
+    ShutdownChildren();
+    Environment.Exit(0);
+};
+
+AppDomain.CurrentDomain.ProcessExit += (_, _) => ShutdownChildren();
+
+foreach (var api in apiServices)
+{
+    StartService(api);
 }
 
-Console.WriteLine("✅ APIs are launched. Waiting for SaaS API to be healthy...");
+Console.WriteLine("APIs launched. Waiting for SaaS API health...");
 
-// Local Development Ports
-const string SAAS_API_PORT = "5114";
-const string SAAS_HEALTH_URL = $"http://localhost:{SAAS_API_PORT}/health";
-const string SAAS_SWAGGER_URL = $"http://localhost:{SAAS_API_PORT}/swagger";
+const string saasHealthUrl = "http://localhost:5114/health";
+const string saasSwaggerUrl = "http://localhost:5114/swagger";
 
-if (await WaitForUrl(SAAS_HEALTH_URL, 120))
+if (!await WaitForUrl(saasHealthUrl, timeoutSeconds: 120))
 {
-    Console.WriteLine("🚀 SaaS API is ready. Opening Swagger...");
-    Process.Start(new ProcessStartInfo(SAAS_SWAGGER_URL) { UseShellExecute = true });
+    Console.WriteLine("SaaS API did not become healthy in time. UIs will still be started.");
 }
 else
 {
-    Console.WriteLine("❌ ERROR: SaaS API failed to become healthy within 120 seconds.");
-    Console.WriteLine("Please check the terminal window labeled 'SaaS-API' for errors.");
+    Console.WriteLine("SaaS API is healthy.");
+    Process.Start(new ProcessStartInfo(saasSwaggerUrl) { UseShellExecute = true });
 }
 
-Console.WriteLine("Press Ctrl+C to exit this orchestrator (note: windows will stay open).");
+foreach (var ui in uiServices)
+{
+    StartService(ui);
+}
 
-// Keep the orchestrator alive
-Thread.Sleep(Timeout.Infinite);
+Console.WriteLine("All brand APIs and UIs have been started.");
+Console.WriteLine("Press Ctrl+C to stop all child processes.");
+await Task.Delay(Timeout.Infinite);
+
+void StartService(Service service)
+{
+    var workingDirectory = Path.Combine(root, service.RelativePath);
+    if (!Directory.Exists(workingDirectory))
+    {
+        Console.WriteLine($"[Skip] {service.Name}: missing directory {workingDirectory}");
+        return;
+    }
+
+    Console.WriteLine($"[Start] {service.Name}: {service.Command}");
+
+    var processInfo = BuildShellStartInfo(service.Command, workingDirectory);
+    var process = Process.Start(processInfo);
+    if (process is null)
+    {
+        Console.WriteLine($"[Error] Failed to start {service.Name}");
+        return;
+    }
+
+    startedProcesses.Add(process);
+}
+
+ProcessStartInfo BuildShellStartInfo(string command, string workingDirectory)
+{
+    if (OperatingSystem.IsWindows())
+    {
+        return new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            Arguments = $"/c {command}",
+            WorkingDirectory = workingDirectory,
+            UseShellExecute = true
+        };
+    }
+
+    return new ProcessStartInfo
+    {
+        FileName = "/bin/bash",
+        Arguments = $"-lc \"{command}\"",
+        WorkingDirectory = workingDirectory,
+        UseShellExecute = true
+    };
+}
 
 async Task<bool> WaitForUrl(string url, int timeoutSeconds)
 {
     using var client = new HttpClient();
-    for (int i = 0; i < timeoutSeconds; i++)
+    var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
+
+    while (DateTime.UtcNow < deadline)
     {
         try
         {
-            var response = await client.GetAsync(url);
+            using var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode) return true;
-            Console.WriteLine($"[Orchestrator] SaaS API check: {response.StatusCode} (Waiting...)");
         }
-        catch (Exception)
+        catch
         {
-            // Just swallow connection refused etc
+            // Retry while service starts.
         }
+
         await Task.Delay(2000);
     }
+
     return false;
 }
+
+void ShutdownChildren()
+{
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+
+    Console.WriteLine("Stopping child processes...");
+    foreach (var process in startedProcesses.Where(p => !p.HasExited))
+    {
+        try
+        {
+            process.Kill(entireProcessTree: true);
+        }
+        catch
+        {
+            // Ignore failures during shutdown.
+        }
+    }
+}
+
+record Service(string Name, string RelativePath, string Command);

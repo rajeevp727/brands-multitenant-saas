@@ -1,0 +1,86 @@
+.brand-preview-page {
+  min-height: calc(100vh - 60px);
+  padding: 30px 16px 72px;
+  background: linear-gradient(180deg, #f4efe6 0%, #f8fafc 100%);
+  display: grid;
+  place-items: center;
+}
+
+body.dark .brand-preview-page {
+  background: linear-gradient(180deg, #051019 0%, #08131a 100%);
+}
+
+.brand-preview-card {
+  width: min(760px, 100%);
+  border: 1px solid rgba(148, 127, 94, 0.2);
+  border-radius: 26px;
+  padding: 30px;
+  background: rgba(255, 252, 246, 0.88);
+  box-shadow: 0 24px 80px rgba(39, 29, 18, 0.12);
+}
+
+body.dark .brand-preview-card {
+  background: rgba(9, 26, 35, 0.78);
+  border-color: rgba(148, 201, 183, 0.16);
+  color: #edf7f3;
+}
+
+.brand-preview-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.2);
+  color: #334155;
+}
+
+.brand-preview-card h1 {
+  margin: 14px 0 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  letter-spacing: -0.04em;
+}
+
+.brand-preview-tagline {
+  margin: 10px 0 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+body.dark .brand-preview-tagline {
+  color: #9ab3ab;
+}
+
+.brand-preview-meta {
+  margin: 10px 0 0;
+}
+
+.brand-preview-list {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.brand-preview-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+body.dark .brand-preview-item {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.brand-preview-link {
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  background: #1d4ed8;
+  color: #ffffff;
+}

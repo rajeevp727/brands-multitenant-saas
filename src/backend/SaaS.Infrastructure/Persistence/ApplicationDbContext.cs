@@ -4,6 +4,7 @@ using SaaS.Domain.Entities;
 using SaaS.Domain.Interfaces;
 using System.Linq.Expressions;
 using System.Reflection;
+using Npgsql;
 
 namespace SaaS.Infrastructure.Persistence;
 
@@ -11,6 +12,8 @@ public class ApplicationDbContext : DbContext
 {
     private readonly ITenantProvider _tenantProvider;
     private readonly IUserContext _userContext;
+    private bool _auditLogTableMissing;
+    private bool? _auditLogsTableExists;
     public string? CurrentTenantId => _tenantProvider.GetTenantId();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantProvider tenantProvider, IUserContext userContext)
@@ -165,7 +168,7 @@ public class ApplicationDbContext : DbContext
 
             var auditEntry = new AuditEntry(entry)
             {
-                TenantId = tenantId,
+                TenantId = tenantId ?? "unknown",
                 UserId = _userContext.UserId ?? "System",
                 EntityName = entry.Entity.GetType().Name
             };
@@ -206,19 +209,82 @@ public class ApplicationDbContext : DbContext
             }
         }
 
-        // Attach audit logs BEFORE save (same transaction)
-        foreach (var auditEntry in auditEntries)
-            AuditLogs.Add(auditEntry.ToAudit());
+        var canWriteAuditLogs = !_auditLogTableMissing && await ShouldWriteAuditLogsAsync();
+        if (canWriteAuditLogs)
+        {
+            // Attach audit logs BEFORE save (same transaction)
+            foreach (var auditEntry in auditEntries)
+                AuditLogs.Add(auditEntry.ToAudit());
+        }
 
         // -----------------------------
         // SINGLE DATABASE COMMIT
         // -----------------------------
-        return await base.SaveChangesAsync();
+        try
+        {
+            return await base.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (!_auditLogTableMissing && IsMissingAuditLogsTable(ex))
+        {
+            // Some local/dev databases were created before the AuditLogs table existed.
+            // Retry once without audit log rows so the app can still boot.
+            _auditLogTableMissing = true;
+            DetachPendingAuditLogs();
+            return await base.SaveChangesAsync();
+        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableThreadSafetyChecks(false);
+    }
+
+    private void DetachPendingAuditLogs()
+    {
+        foreach (var entry in ChangeTracker.Entries<AuditLog>().Where(e => e.State == EntityState.Added))
+        {
+            entry.State = EntityState.Detached;
+        }
+    }
+
+    private static bool IsMissingAuditLogsTable(DbUpdateException ex)
+    {
+        if (ex.InnerException is not PostgresException pgEx)
+        {
+            return false;
+        }
+
+        return pgEx.SqlState == "42P01" &&
+               pgEx.MessageText.Contains("AuditLogs", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task<bool> ShouldWriteAuditLogsAsync()
+    {
+        if (_auditLogsTableExists.HasValue)
+        {
+            return _auditLogsTableExists.Value;
+        }
+
+        try
+        {
+            var connection = Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
+            {
+                await connection.OpenAsync();
+            }
+
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT to_regclass('public.\"AuditLogs\"')";
+            var result = await command.ExecuteScalarAsync();
+            _auditLogsTableExists = result is not null && result != DBNull.Value;
+        }
+        catch
+        {
+            // If metadata check fails, avoid breaking normal save flow.
+            _auditLogsTableExists = false;
+        }
+
+        return _auditLogsTableExists.Value;
     }
 }
 

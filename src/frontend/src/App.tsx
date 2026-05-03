@@ -6,6 +6,7 @@ import SplashScreen from './components/common/SplashScreen';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import MarkdownPage from './pages/MarkdownPage';
+import BrandComingSoonPage from './pages/BrandComingSoonPage';
 import { BrandProvider } from './providers/BrandProvider';
 import { useBrand } from './providers/BrandContext';
 import { ThemeProvider } from './providers/ThemeProvider';
@@ -30,6 +31,7 @@ const AppContent = () => {
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/brand-preview/:tenantId" element={<BrandComingSoonPage />} />
             <Route path="/privacy" element={<MarkdownPage title="Privacy Policy" type="privacy" />} />
             <Route path="/terms" element={<MarkdownPage title="Terms of Service" type="terms" />} />
             <Route path="/support" element={<MarkdownPage title="Help & Support" type="support" />} />

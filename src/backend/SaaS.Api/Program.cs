@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SaaS.Api.Core.Tenancy;
@@ -14,6 +15,12 @@ using Serilog;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+var childApiProcesses = new List<Process>();
+
+if (builder.Environment.IsDevelopment())
+{
+    TryStartSiblingApis(childApiProcesses);
+}
 
 // Configure Serilog
 Serilog.Log.Logger = new LoggerConfiguration()
@@ -174,7 +181,64 @@ catch (Exception ex)
 }
 finally
 {
+    StopChildProcesses(childApiProcesses);
     Serilog.Log.CloseAndFlush();
+}
+
+static void TryStartSiblingApis(List<Process> childApiProcesses)
+{
+    var currentDir = Directory.GetCurrentDirectory();
+    var runningInsideSaasApiFolder = currentDir.Replace('\\', '/').EndsWith("/src/backend/SaaS.Api", StringComparison.OrdinalIgnoreCase);
+    if (!runningInsideSaasApiFolder) return;
+
+    var siblingApis = new[]
+    {
+        new { Name = "GreenPantry-API", RelativePath = "../modules/GreenPantry/backend/GreenPantry.API", Command = "dotnet run --urls http://0.0.0.0:7001" },
+        new { Name = "BangaruKottu-API", RelativePath = "../modules/BangaruKottu/backend/Vendor.API", Command = "dotnet run --urls http://0.0.0.0:7002" }
+    };
+
+    foreach (var api in siblingApis)
+    {
+        var apiDir = Path.GetFullPath(Path.Combine(currentDir, api.RelativePath));
+        if (!Directory.Exists(apiDir))
+        {
+            Console.WriteLine($"[Startup] Skipping {api.Name}, path not found: {apiDir}");
+            continue;
+        }
+
+        Console.WriteLine($"[Startup] Launching {api.Name}...");
+
+        var process = Process.Start(new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            Arguments = $"/c {api.Command}",
+            WorkingDirectory = apiDir,
+            UseShellExecute = true
+        });
+
+        if (process != null)
+        {
+            childApiProcesses.Add(process);
+        }
+    }
+}
+
+static void StopChildProcesses(List<Process> childApiProcesses)
+{
+    foreach (var process in childApiProcesses)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch
+        {
+            // Ignore shutdown errors for child APIs.
+        }
+    }
 }
 
 public partial class Program { }
