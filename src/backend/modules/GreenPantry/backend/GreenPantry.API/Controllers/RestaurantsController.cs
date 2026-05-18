@@ -18,6 +18,7 @@ public class RestaurantsController : BaseApiController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<RestaurantDto>>> GetRestaurants([FromQuery] RestaurantFilterDto filter)
     {
         var restaurants = await _restaurantService.GetRestaurantsAsync(filter);
@@ -25,6 +26,7 @@ public class RestaurantsController : BaseApiController
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<RestaurantDetailDto>> GetRestaurant(string id)
     {
         var restaurant = await _restaurantService.GetRestaurantByIdAsync(id);
@@ -37,6 +39,7 @@ public class RestaurantsController : BaseApiController
     }
 
     [HttpGet("{id}/menu")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<MenuCategoryDto>>> GetRestaurantMenu(string id)
     {
         var menu = await _menuService.GetMenuByRestaurantIdAsync(id);

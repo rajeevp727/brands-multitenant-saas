@@ -19,7 +19,9 @@ var uiServices = new[]
     new Service("SaaS-UI", "src/frontend", "npm run dev -- --port 5173"),
     new Service("GreenPantry-UI", "src/backend/modules/GreenPantry/frontend", "npm run dev -- --port 5174"),
     new Service("OmegaTech-UI", "src/backend/modules/OmegaTech", "npm run start"),
-    new Service("BangaruKottu-UI", "src/backend/modules/BangaruKottu/frontend", "npm run dev -- --port 5176")
+    new Service("BangaruKottu-UI", "src/backend/modules/BangaruKottu/frontend", "npm run dev -- --port 5176"),
+    new Service("Vanavajram-UI", "src/backend/modules/Vanavajram", "npm run dev"),
+    new Service("VajraValli-UI", "src/backend/modules/VajraValli", "npm run dev")
 };
 
 Console.CancelKeyPress += (_, eventArgs) =>
