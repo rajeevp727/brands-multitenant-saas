@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GreenPantry.API.Controllers;
 
 
+[AllowAnonymous]
 public class PaymentController : BaseApiController
 {
     private readonly IPaymentFactoryService _paymentFactory;
@@ -60,6 +61,7 @@ public class PaymentController : BaseApiController
     }
 
     [HttpPost("refund")]
+    [Authorize]
     public async Task<ActionResult<PaymentResponseDto>> ProcessRefund([FromBody] RefundRequestDto request)
     {
         if (!await _paymentFactory.IsProviderEnabledAsync(request.Provider))

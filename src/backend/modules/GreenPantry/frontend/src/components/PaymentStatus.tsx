@@ -208,12 +208,20 @@ export const PaymentStatusComponent: React.FC<PaymentStatusProps> = ({
       </div>
 
       {/* UPI QR Code (if available) */}
-      {payment.upiQRData && payment.status === PaymentStatus.Pending && (
+      {(payment.upiQRCode || payment.upiQRData) && payment.status === PaymentStatus.Pending && (
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-3">UPI QR Code</h4>
           <div className="text-center">
             <img
-              src={`data:image/png;base64,${payment.upiQRData}`}
+              src={
+                payment.upiQRCode 
+                  ? (payment.upiQRCode.startsWith('data:') 
+                      ? payment.upiQRCode 
+                      : `data:image/png;base64,${payment.upiQRCode}`)
+                  : (payment.upiQRData?.startsWith('data:')
+                      ? payment.upiQRData
+                      : `data:image/png;base64,${payment.upiQRData}`)
+              }
               alt="UPI QR Code"
               className="w-32 h-32 mx-auto"
             />

@@ -3,7 +3,7 @@ const { execSync } = require('child_process');
 // We exclude node.exe from the auto-kill by name to avoid killing the npm/node orchestration process itself.
 // However, we MUST kill processes on specific ports even if they are 'node' (like lingering vite servers).
 const processesToKillByName = ['dotnet.exe', 'ApiOrchestrator.exe', 'VSTest.Console.exe', 'VBCSCompiler.exe'];
-const portsToClean = [5114, 5173, 5174, 5175, 5176, 7001, 7002];
+const portsToClean = [5114, 5173, 5174, 5175, 5176, 5177, 5178, 7001, 7002];
 
 console.log('--- SYSTEM CLEANUP START ---');
 

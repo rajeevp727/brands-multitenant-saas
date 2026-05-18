@@ -40,6 +40,13 @@ public class PhonePePaymentService : IPhonePePaymentService
         try
         {
             var orderId = $"ORDER_{request.OrderId}_{DateTime.UtcNow:yyyyMMddHHmmss}";
+            
+            if (_isTestMode && (_merchantId == "your_merchant_id_here" || string.IsNullOrEmpty(_merchantId)))
+            {
+                _logger.LogWarning("Using PhonePe payment SIMULATOR because credentials are not configured");
+                return GetMockPaymentResponse(request, orderId);
+            }
+
             var amount = (int)(request.Amount * 100); // Convert to paise
             
             var requestData = new
@@ -114,6 +121,36 @@ public class PhonePePaymentService : IPhonePePaymentService
         }
     }
 
+    private PaymentResponseDto GetMockPaymentResponse(PaymentRequestDto request, string orderId)
+    {
+        var upiId = _configuration["PaymentProviders:PhonePe:UPIId"] ?? "greenpantry@phonepe";
+        var merchantName = _configuration["PaymentProviders:PhonePe:MerchantName"] ?? "GreenPantry";
+        var upiString = $"upi://pay?pa={upiId}&pn={merchantName}&am={request.Amount:F2}&cu={request.Currency}&tr={request.OrderId}&tn={request.Description}";
+        var qrCode = GenerateQRCode(upiString);
+
+        return new PaymentResponseDto
+        {
+            PaymentId = orderId,
+            OrderId = request.OrderId,
+            Provider = PaymentProvider.PhonePe,
+            Status = PaymentStatus.Pending,
+            Amount = request.Amount,
+            Currency = request.Currency,
+            ProviderTransactionId = orderId,
+            PaymentUrl = $"http://localhost:5174/payment/success?paymentId={orderId}",
+            UPIQRCode = qrCode,
+            UPIQRData = upiString,
+            QRExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ProviderMetadata = new Dictionary<string, object>
+            {
+                ["merchant_transaction_id"] = orderId,
+                ["amount"] = (int)(request.Amount * 100),
+                ["merchant_id"] = "MOCK_MERCHANT",
+                ["is_mock"] = true
+            }
+        };
+    }
+
     public async Task<PaymentResponseDto> GenerateUPIQRAsync(UPIQRRequestDto request)
     {
         try
@@ -158,6 +195,21 @@ public class PhonePePaymentService : IPhonePePaymentService
 
     public async Task<PaymentResponseDto> GetPaymentStatusAsync(string paymentId)
     {
+        if (_isTestMode && (_merchantId == "your_merchant_id_here" || string.IsNullOrEmpty(_merchantId) || paymentId.StartsWith("ORDER_")))
+        {
+            _logger.LogInformation("PhonePe Simulator: Auto-completing payment status for {PaymentId}", paymentId);
+            return new PaymentResponseDto
+            {
+                PaymentId = paymentId,
+                OrderId = paymentId,
+                Provider = PaymentProvider.PhonePe,
+                Status = PaymentStatus.Success,
+                Amount = 10.0m,
+                Currency = "INR",
+                ProviderTransactionId = paymentId
+            };
+        }
+
         try
         {
             var merchantTransactionId = paymentId;
@@ -347,9 +399,11 @@ public class PhonePePaymentService : IPhonePePaymentService
 
     private string GenerateQRCode(string data)
     {
-        // Simplified QR code generation - return placeholder for now
-        // In production, this would generate actual QR codes
-        return $"data:image/png;base64,QR_PLACEHOLDER_FOR_{data}";
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrCodeImage = qrCode.GetGraphic(20);
+        return $"data:image/png;base64,{Convert.ToBase64String(qrCodeImage)}";
     }
 
     private string ComputeSha256(string input)

@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "prestart": "node scripts/stop-services.js",
-        "start": "concurrently -n \"API,UI\" -c \"blue,green\" \"npm run start:apis\" \"npm run start:ui:saas\"",
+        "start": "npm run start:all",
         "start:all": "concurrently -n \"APIs,UIs\" -c \"blue,green\" \"npm run start:apis\" \"npm run start:uis\"",
         "start:apis": "concurrently -n \"SAAS-API,GP-API,BK-API\" -c \"blue.bold,cyan.bold,yellow.bold\" \"npm run start:api:saas\" \"dotnet run --project src/backend/modules/GreenPantry/backend/GreenPantry.API/GreenPantry.API.csproj --urls http://0.0.0.0:7001\" \"dotnet run --project src/backend/modules/BangaruKottu/backend/Vendor.API/Vendor.API.csproj --urls http://0.0.0.0:7002\"",
         "start:api:saas": "dotnet run --project src/backend/SaaS.Api/SaaS.Api.csproj --urls http://0.0.0.0:5114",

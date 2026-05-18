@@ -5,11 +5,12 @@ import { CardPayment } from './CardPayment'
 import { PaymentProvider, PaymentResponse, PaymentStatus } from '../types'
 import { useCart } from '../hooks/useCart'
 import { useAuthStore } from '../store/authStore'
-import { X, MapPin } from 'lucide-react'
+import { X, MapPin, RefreshCw, Smartphone, Check, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { createPortal } from 'react-dom'
 import { apiService } from '../services/api'
 import { useOrderStore, Order } from '../store/orderStore'
+import { paymentService } from '../services/paymentService'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -43,12 +44,52 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderId, setOrderId] = useState<string>('')
   const [paymentTimer, setPaymentTimer] = useState(120)
   const [isTimedOut, setIsTimedOut] = useState(false)
+  const [paymentResponse, setPaymentResponse] = useState<PaymentResponse | null>(null)
+  const [isLoadingPayment, setIsLoadingPayment] = useState(false)
+  const [upiPhoneNumber, setUpiPhoneNumber] = useState<string>('7032075893')
+
+  const initiateUPIPayment = async (providerOverride?: PaymentProvider) => {
+    setIsLoadingPayment(true)
+    const provider = providerOverride || selectedProvider || PaymentProvider.PhonePe
+    try {
+      const request = {
+        orderId,
+        amount: total,
+        currency: 'INR',
+        provider,
+        customerName: user?.name || 'Customer',
+        customerEmail: user?.email || 'customer@test.com',
+        customerPhone: upiPhoneNumber || user?.phoneNumber || '+917032075893',
+        description: `Checkout for Order #${orderId}`,
+        expiryMinutes: 5
+      }
+
+      console.log('Initiating UPI payment:', request)
+      const response = await paymentService.generateUPIQR(request)
+      setPaymentResponse(response)
+      setPaymentTimer(120)
+      setIsTimedOut(false)
+
+      // If mobile app is selected, open deep link
+      if (currentStep === 'upi_app_selected' || selectedMethod === 'upi-app') {
+        const upiLink = response.upiQRData || `upi://pay?pa=7032075893@ybl&pn=GreenPantry&am=${total}&cu=INR`;
+        window.location.href = upiLink;
+      }
+
+      toast.success(`Payment request initiated with ${provider}`)
+    } catch (error: any) {
+      console.error('Failed to initiate UPI payment:', error)
+      toast.error(error.response?.data?.message || 'Failed to initiate payment')
+    } finally {
+      setIsLoadingPayment(false)
+    }
+  }
 
   const [address, setAddress] = useState<DeliveryAddress>({
-    street: user?.streetAddress || '',
-    city: user?.city || '',
-    state: user?.state || '',
-    postalCode: user?.postalCode || '',
+    street: user?.streetAddress || 'Hyderabad',
+    city: user?.city || 'Hyderabad',
+    state: user?.state || 'Hyderabad',
+    postalCode: user?.postalCode || 'Hyderabad',
     country: user?.country || 'India',
     latitude: user?.latitude || 0,
     longitude: user?.longitude || 0
@@ -67,10 +108,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   }, [isOpen])
 
-  // Timer for UPI Payments
+  // Timer and Polling for UPI Payments
   useEffect(() => {
     let interval: NodeJS.Timeout
+    let pollInterval: NodeJS.Timeout
+
     if ((currentStep === 'upi_qr' || currentStep === 'upi_app_selected') && !isTimedOut) {
+      // Countdown Timer
       interval = setInterval(() => {
         setPaymentTimer((prev) => {
           if (prev <= 1) {
@@ -78,13 +122,39 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             setIsTimedOut(true)
             return 0
           }
-          // Simulate polling status here...
           return prev - 1
         })
       }, 1000)
+
+      // Polling backend status every 4 seconds
+      pollInterval = setInterval(async () => {
+        if (paymentResponse?.paymentId) {
+          try {
+            const provider = paymentResponse.provider || selectedProvider || PaymentProvider.PhonePe
+            const response = await paymentService.getPaymentStatus(paymentResponse.paymentId, provider)
+
+            if (response.status === 'Success') {
+              clearInterval(interval)
+              clearInterval(pollInterval)
+              handlePaymentSuccess(response)
+            } else if (response.status === 'Failed') {
+              clearInterval(interval)
+              clearInterval(pollInterval)
+              toast.error('Payment failed')
+              setCurrentStep('payment')
+            }
+          } catch (error) {
+            console.error('Error polling payment status:', error)
+          }
+        }
+      }, 4000)
     }
-    return () => clearInterval(interval)
-  }, [currentStep, isTimedOut])
+
+    return () => {
+      clearInterval(interval)
+      clearInterval(pollInterval)
+    }
+  }, [currentStep, isTimedOut, paymentResponse])
 
   const handleAddressSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -117,20 +187,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setCurrentStep('payment')
   }
 
-  const handleMethodSelect = (method: string, provider?: PaymentProvider) => {
+  const handleMethodSelect = (method: string, provider?: PaymentProvider, phoneNumber?: string) => {
     setSelectedMethod(method)
     setSelectedProvider(provider)
+    if (phoneNumber) {
+      setUpiPhoneNumber(phoneNumber)
+    }
   }
 
   const handleProceedToPay = () => {
-    setPaymentTimer(120)
-    setIsTimedOut(false)
     if (selectedMethod === 'cod') {
       handleCODOrder()
     } else if (selectedMethod === 'upi-qr') {
       setCurrentStep('upi_qr')
+      initiateUPIPayment()
     } else if (selectedMethod === 'upi-app') {
       setCurrentStep('upi_app_selected')
+      initiateUPIPayment()
     } else if (selectedMethod === 'card') {
       setCurrentStep('card_form')
     } else {
@@ -388,15 +461,45 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
             {currentStep === 'payment' && (
               <div className="space-y-6">
-                {/* Order Summary (Compact) */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
-                      {cartState.itemCount} items
-                    </span>
-                    <span className="text-lg font-semibold">
-                      ₹{total.toFixed(2)}
-                    </span>
+                {/* Order Summary (Detailed Bill Breakup) */}
+                <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-5 border border-blue-100 shadow-sm space-y-3">
+                  <h4 className="text-sm font-bold text-blue-900 uppercase tracking-wider mb-2">Bill Breakup</h4>
+                  
+                  {/* Cart items summary */}
+                  <div className="space-y-2 border-b border-blue-50 pb-3 max-h-32 overflow-y-auto pr-1">
+                    {cartState.items.map((item) => (
+                      <div key={`${item.menuItem.id}-${item.variant}`} className="flex justify-between items-center text-sm text-gray-700">
+                        <span className="truncate max-w-[200px]">
+                          {item.quantity}x {item.menuItem.name} 
+                          {item.variant !== 'Regular' && <span className="text-xs text-gray-500 ml-1">({item.variant})</span>}
+                        </span>
+                        <span className="font-medium">₹{(item.menuItem.price * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex justify-between items-center">
+                      <span>Items Subtotal</span>
+                      <span className="font-semibold text-gray-900">₹{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Delivery Fee</span>
+                      {deliveryFee === 0 ? (
+                        <span className="text-green-600 font-bold">FREE</span>
+                      ) : (
+                        <span className="font-semibold text-gray-900">₹{deliveryFee.toFixed(2)}</span>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>GST (18%)</span>
+                      <span className="font-semibold text-gray-900">₹{tax.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center border-t border-blue-100 pt-3 mt-1">
+                    <span className="text-base font-bold text-gray-900">To Pay</span>
+                    <span className="text-xl font-extrabold text-blue-600">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -421,7 +524,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             )}
 
             {currentStep === 'card_form' && (
-              <CardPayment 
+              <CardPayment
                 amount={total}
                 onSuccess={() => {
                   handlePaymentSuccess({
@@ -443,13 +546,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <h3 className="text-lg font-bold text-purple-900 mb-4">Scan to Pay ₹{total.toFixed(2)}</h3>
                 <div className="bg-white p-4 rounded-lg border-2 border-purple-200 inline-block mb-6 relative">
                   <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=7032075893@ybl&pn=GreenPantry&am=${total}&cu=INR`)}`}
+                    src={
+                      paymentResponse?.upiQRCode
+                        ? (paymentResponse.upiQRCode.startsWith('data:')
+                          ? paymentResponse.upiQRCode
+                          : `data:image/png;base64,${paymentResponse.upiQRCode}`)
+                        : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentResponse?.upiQRData || `upi://pay?pa=7032075893@ybl&pn=GreenPantry&am=${total}&cu=INR`)}`
+                    }
                     alt="UPI QR Code"
-                    className={`w-48 h-48 mx-auto transition-opacity ${isTimedOut ? 'opacity-20' : 'opacity-100'}`}
+                    className={`w-48 h-48 mx-auto transition-opacity ${isTimedOut || isLoadingPayment ? 'opacity-20' : 'opacity-100'}`}
                   />
-                  {isTimedOut && (
+                  {(isTimedOut || isLoadingPayment) && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="bg-red-100 text-red-600 font-bold px-3 py-1 rounded">QR Expired</span>
+                      <span className="bg-red-100 text-red-600 font-bold px-3 py-1 rounded">
+                        {isLoadingPayment ? 'Generating...' : 'QR Expired'}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -460,31 +571,129 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 ) : (
                   <p className="text-sm font-medium text-red-600 mb-4">Time out! Please try again.</p>
                 )}
-                <div className="flex px-6">
-                  <button onClick={() => setCurrentStep('payment')} className="w-full bg-gray-100 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition-colors">
-                    Cancel & Go Back
-                  </button>
-                </div>
+                {isTimedOut ? (
+                  <div className="flex gap-4 px-6">
+                    <button
+                      onClick={() => initiateUPIPayment()}
+                      disabled={isLoadingPayment}
+                      className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${isLoadingPayment ? 'animate-spin' : ''}`} />
+                      <span>{isLoadingPayment ? 'Retrying...' : 'Retry'}</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('payment')}
+                      className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors border border-gray-200"
+                    >
+                      Go Back
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex px-6">
+                    <button onClick={() => setCurrentStep('payment')} className="w-full bg-gray-100 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition-colors">
+                      Cancel & Go Back
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
             {currentStep === 'upi_app_selected' && (
-              <div className="text-center py-8">
-                <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${isTimedOut ? 'border-red-600' : 'border-blue-600'}`}></div>
-                <h3 className={`text-lg font-medium mb-2 ${isTimedOut ? 'text-red-600' : 'text-gray-900'}`}>
-                  {isTimedOut ? 'Time out!' : 'Checking payment status...'}
-                </h3>
-                <p className="text-gray-600 mb-2">
-                  Please complete the payment of ₹{total.toFixed(2)} on your mobile device.
-                </p>
-                {!isTimedOut ? (
-                  <p className="text-sm font-medium text-orange-600 mb-6 animate-pulse">Polling payment status... ({paymentTimer}s)</p>
-                ) : (
-                  <p className="text-sm font-medium text-red-600 mb-6">Request expired. Please try again.</p>
-                )}
-                <div className="flex px-6">
-                  <button onClick={() => setCurrentStep('payment')} className="w-full bg-gray-100 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition-colors">
-                    Cancel & Go Back
+              <div className="text-center py-6 max-w-md mx-auto space-y-6">
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm text-left relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+
+                  <div className="flex items-center space-x-2 text-blue-800 font-bold mb-3">
+                    <Smartphone className="w-5 h-5" />
+                    <span className="text-sm uppercase tracking-wider">UPI Notification simulator</span>
+                  </div>
+
+                  <h4 className="text-base font-bold text-gray-900 mb-2">Why didn't you receive a notification?</h4>
+                  <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                    Since the system is running in <strong>Sandbox Mode</strong> locally, physical push notifications cannot be delivered to your physical phone's UPI app. Instead, you can fully test and experience the payment flow using the interactive controls below!
+                  </p>
+
+                  {/* Simulated push notification */}
+                  <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative z-10 space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-50">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center text-white font-black text-xs shadow-sm">
+                          Pe
+                        </div>
+                        <div>
+                          <span className="block text-xs font-semibold text-gray-900">PhonePe</span>
+                          <span className="block text-[10px] text-gray-400">GreenPantry Payment Request</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-medium">Just now</span>
+                    </div>
+
+                    <p className="text-xs text-gray-700">
+                      <strong>GreenPantry</strong> is requesting a payment of <strong className="text-purple-600 font-bold text-sm">₹{total.toFixed(2)}</strong>.
+                    </p>
+
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => {
+                          if (paymentResponse) {
+                            handlePaymentSuccess({
+                              ...paymentResponse,
+                              status: PaymentStatus.Success
+                            });
+                          }
+                        }}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-xs font-bold shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-1"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Approve Pay</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          toast.error('Payment declined by user');
+                          setCurrentStep('payment');
+                        }}
+                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        <span>Decline</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-gray-100 rounded-xl p-4 text-left space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Selected App:</span>
+                    <span className="font-semibold text-gray-900">{selectedProvider || 'PhonePe'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Phone Number:</span>
+                    <span className="font-semibold text-gray-900">{upiPhoneNumber}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Status:</span>
+                    <span className="inline-flex items-center space-x-1 text-orange-600 font-bold animate-pulse">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>Waiting ({paymentTimer}s)</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => initiateUPIPayment()}
+                    disabled={isLoadingPayment}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isLoadingPayment ? 'animate-spin' : ''}`} />
+                    <span>{isLoadingPayment ? 'Resending...' : 'Resend Request'}</span>
+                  </button>
+                  <button
+                    onClick={() => setCurrentStep('payment')}
+                    className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors border border-gray-200"
+                  >
+                    Go Back
                   </button>
                 </div>
               </div>

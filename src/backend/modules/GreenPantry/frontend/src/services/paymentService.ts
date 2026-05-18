@@ -2,7 +2,7 @@ import apiService from './api'
 import { PaymentRequest, UPIQRRequest, PaymentResponse, RefundRequest, PaymentProvider, PaymentConfiguration } from '../types'
 
 export class PaymentService {
-  private baseUrl = '/api/payment'
+  private baseUrl = '/payment'
 
   async createPayment(request: PaymentRequest): Promise<PaymentResponse> {
     const response = await apiService.getAxiosInstance().post(`${this.baseUrl}/create`, request)

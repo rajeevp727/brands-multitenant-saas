@@ -39,6 +39,14 @@ public class RazorpayPaymentService : IRazorpayPaymentService
     {
         try
         {
+            var mockOrderId = $"order_{request.OrderId}_{DateTime.UtcNow:yyyyMMddHHmmss}";
+            
+            if (_isTestMode && (_apiKey == "rzp_test_your_api_key_here" || string.IsNullOrEmpty(_apiKey) || _apiKey.Contains("your_api")))
+            {
+                _logger.LogWarning("Using Razorpay payment SIMULATOR because credentials are not configured");
+                return GetMockPaymentResponse(request, mockOrderId);
+            }
+
             var client = new RestClient(_baseUrl);
             var restRequest = new RestRequest("/orders", Method.Post);
             
@@ -97,6 +105,35 @@ public class RazorpayPaymentService : IRazorpayPaymentService
         }
     }
 
+    private PaymentResponseDto GetMockPaymentResponse(PaymentRequestDto request, string orderId)
+    {
+        var upiId = _configuration["PaymentProviders:Razorpay:UPIId"] ?? "greenpantry@razorpay";
+        var merchantName = _configuration["PaymentProviders:Razorpay:MerchantName"] ?? "GreenPantry";
+        var upiString = $"upi://pay?pa={upiId}&pn={merchantName}&am={request.Amount:F2}&cu={request.Currency}&tr={request.OrderId}&tn={request.Description}";
+        var qrCode = GenerateQRCode(upiString);
+
+        return new PaymentResponseDto
+        {
+            PaymentId = orderId,
+            OrderId = request.OrderId,
+            Provider = PaymentProvider.Razorpay,
+            Status = PaymentStatus.Pending,
+            Amount = request.Amount,
+            Currency = request.Currency,
+            ProviderTransactionId = orderId,
+            PaymentUrl = $"http://localhost:5174/payment/success?paymentId={orderId}",
+            UPIQRCode = qrCode,
+            UPIQRData = upiString,
+            QRExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ProviderMetadata = new Dictionary<string, object>
+            {
+                ["razorpay_order_id"] = orderId,
+                ["amount"] = (int)(request.Amount * 100),
+                ["is_mock"] = true
+            }
+        };
+    }
+
     public async Task<PaymentResponseDto> GenerateUPIQRAsync(UPIQRRequestDto request)
     {
         try
@@ -141,13 +178,28 @@ public class RazorpayPaymentService : IRazorpayPaymentService
 
     public async Task<PaymentResponseDto> GetPaymentStatusAsync(string paymentId)
     {
+        if (_isTestMode && (_apiKey == "rzp_test_your_api_key_here" || string.IsNullOrEmpty(_apiKey) || _apiKey.Contains("your_api") || paymentId.StartsWith("order_")))
+        {
+            _logger.LogInformation("Razorpay Simulator: Auto-completing payment status for {PaymentId}", paymentId);
+            return new PaymentResponseDto
+            {
+                PaymentId = paymentId,
+                OrderId = paymentId,
+                Provider = PaymentProvider.Razorpay,
+                Status = PaymentStatus.Success,
+                Amount = 10.0m,
+                Currency = "INR",
+                ProviderTransactionId = paymentId
+            };
+        }
+
         try
         {
             var client = new RestClient(_baseUrl);
             var restRequest = new RestRequest($"/orders/{paymentId}", Method.Get);
             
             restRequest.AddHeader("Authorization", $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_apiKey}:{_apiSecret}"))}");
-
+ 
             var response = await client.ExecuteAsync(restRequest);
             
             if (!response.IsSuccessful)
@@ -305,9 +357,11 @@ public class RazorpayPaymentService : IRazorpayPaymentService
 
     private string GenerateQRCode(string data)
     {
-        // Simplified QR code generation - return placeholder for now
-        // In production, this would generate actual QR codes
-        return $"data:image/png;base64,QR_PLACEHOLDER_FOR_{data}";
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrCodeImage = qrCode.GetGraphic(20);
+        return $"data:image/png;base64,{Convert.ToBase64String(qrCodeImage)}";
     }
 
     private string ComputeHmacSha256(string payload, string secret)

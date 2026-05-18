@@ -230,6 +230,7 @@ export interface PaymentResponse {
   currency: string
   providerTransactionId: string
   upiQRData?: string
+  upiQRCode?: string
   qrExpiresAt?: string
   paymentUrl?: string
   providerMetadata?: Record<string, unknown>

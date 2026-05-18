@@ -241,11 +241,19 @@ export const UPIQRPayment: React.FC<UPIQRPaymentProps> = ({
           </div>
 
           {/* QR Code */}
-          {paymentResponse.upiQRData && (
+          {(paymentResponse.upiQRCode || paymentResponse.upiQRData) && (
             <div className="text-center">
               <div className="bg-white p-4 rounded-lg border-2 border-gray-200 inline-block">
                 <img
-                  src={`data:image/png;base64,${paymentResponse.upiQRData}`}
+                  src={
+                    paymentResponse.upiQRCode 
+                      ? (paymentResponse.upiQRCode.startsWith('data:') 
+                          ? paymentResponse.upiQRCode 
+                          : `data:image/png;base64,${paymentResponse.upiQRCode}`)
+                      : (paymentResponse.upiQRData?.startsWith('data:')
+                          ? paymentResponse.upiQRData
+                          : `data:image/png;base64,${paymentResponse.upiQRData}`)
+                  }
                   alt="UPI QR Code"
                   className="w-48 h-48 mx-auto"
                 />

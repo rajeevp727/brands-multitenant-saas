@@ -40,6 +40,13 @@ public class PaytmPaymentService : IPaytmPaymentService
         try
         {
             var orderId = $"ORDER_{request.OrderId}_{DateTime.UtcNow:yyyyMMddHHmmss}";
+            
+            if (_isTestMode && (_merchantId == "your_merchant_id_here" || string.IsNullOrEmpty(_merchantId)))
+            {
+                _logger.LogWarning("Using Paytm payment SIMULATOR because credentials are not configured");
+                return GetMockPaymentResponse(request, orderId);
+            }
+
             var amount = request.Amount.ToString("F2");
             
             var paytmParams = new Dictionary<string, string>
@@ -86,6 +93,36 @@ public class PaytmPaymentService : IPaytmPaymentService
         }
     }
 
+    private PaymentResponseDto GetMockPaymentResponse(PaymentRequestDto request, string orderId)
+    {
+        var upiId = _configuration["PaymentProviders:Paytm:UPIId"] ?? "greenpantry@paytm";
+        var merchantName = _configuration["PaymentProviders:Paytm:MerchantName"] ?? "GreenPantry";
+        var upiString = $"upi://pay?pa={upiId}&pn={merchantName}&am={request.Amount:F2}&cu={request.Currency}&tr={request.OrderId}&tn={request.Description}";
+        var qrCode = GenerateQRCode(upiString);
+
+        return new PaymentResponseDto
+        {
+            PaymentId = orderId,
+            OrderId = request.OrderId,
+            Provider = PaymentProvider.Paytm,
+            Status = PaymentStatus.Pending,
+            Amount = request.Amount,
+            Currency = request.Currency,
+            ProviderTransactionId = orderId,
+            PaymentUrl = $"http://localhost:5174/payment/success?paymentId={orderId}",
+            UPIQRCode = qrCode,
+            UPIQRData = upiString,
+            QRExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ProviderMetadata = new Dictionary<string, object>
+            {
+                ["MID"] = "MOCK_MID",
+                ["ORDER_ID"] = orderId,
+                ["TXN_AMOUNT"] = request.Amount.ToString("F2"),
+                ["is_mock"] = true
+            }
+        };
+    }
+
     public async Task<PaymentResponseDto> GenerateUPIQRAsync(UPIQRRequestDto request)
     {
         try
@@ -130,6 +167,21 @@ public class PaytmPaymentService : IPaytmPaymentService
 
     public async Task<PaymentResponseDto> GetPaymentStatusAsync(string paymentId)
     {
+        if (_isTestMode && (_merchantId == "your_merchant_id_here" || string.IsNullOrEmpty(_merchantId) || paymentId.StartsWith("ORDER_")))
+        {
+            _logger.LogInformation("Paytm Simulator: Auto-completing payment status for {PaymentId}", paymentId);
+            return new PaymentResponseDto
+            {
+                PaymentId = paymentId,
+                OrderId = paymentId,
+                Provider = PaymentProvider.Paytm,
+                Status = PaymentStatus.Success,
+                Amount = 10.0m,
+                Currency = "INR",
+                ProviderTransactionId = paymentId
+            };
+        }
+
         try
         {
             var client = new RestClient(_baseUrl);
@@ -311,9 +363,11 @@ public class PaytmPaymentService : IPaytmPaymentService
 
     private string GenerateQRCode(string data)
     {
-        // Simplified QR code generation - return placeholder for now
-        // In production, this would generate actual QR codes
-        return $"data:image/png;base64,QR_PLACEHOLDER_FOR_{data}";
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrCodeImage = qrCode.GetGraphic(20);
+        return $"data:image/png;base64,{Convert.ToBase64String(qrCodeImage)}";
     }
 
     private string GenerateChecksum(Dictionary<string, string> parameters)
