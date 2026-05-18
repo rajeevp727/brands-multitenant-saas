@@ -15,6 +15,7 @@ public class MenuController : BaseApiController
     }
 
     [HttpGet("restaurant/{restaurantId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<MenuCategoryDto>>> GetMenuByRestaurant(string restaurantId)
     {
         var menu = await _menuService.GetMenuByRestaurantIdAsync(restaurantId);
@@ -22,6 +23,7 @@ public class MenuController : BaseApiController
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<MenuItemDto>> GetMenuItem(string id)
     {
         var menuItem = await _menuService.GetMenuItemByIdAsync(id);

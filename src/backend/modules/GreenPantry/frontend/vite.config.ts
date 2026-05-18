@@ -9,6 +9,21 @@ export default defineConfig({
     host: true,
     strictPort: true,
     proxy: {
+      '/api/brands': {
+        target: 'http://127.0.0.1:5114',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api/constants': {
+        target: 'http://127.0.0.1:5114',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api/auth': {
+        target: 'http://127.0.0.1:5114',
+        changeOrigin: true,
+        secure: false,
+      },
       '/api': {
         target: 'http://127.0.0.1:7001',
         changeOrigin: true,
