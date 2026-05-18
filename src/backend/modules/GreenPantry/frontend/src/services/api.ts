@@ -95,20 +95,19 @@ class ApiService {
 
               originalRequest.headers.Authorization = `Bearer ${response.data.token}`
               return this.api!(originalRequest)
-            } else {
               // Only logout if NOT in the middle of SSO initialization
               const isInitializing = useAuthStore.getState().isInitializing;
               if (!isInitializing) {
-                // useAuthStore.getState().logout()
-                // window.location.href = '/login'
+                useAuthStore.getState().logout()
+                window.location.href = '/login'
               }
             }
           } catch (refreshError) {
             // Only logout if NOT in the middle of SSO initialization
             const isInitializing = useAuthStore.getState().isInitializing;
             if (!isInitializing) {
-              // useAuthStore.getState().logout()
-              // window.location.href = '/login'
+              useAuthStore.getState().logout()
+              window.location.href = '/login'
             }
           }
         }

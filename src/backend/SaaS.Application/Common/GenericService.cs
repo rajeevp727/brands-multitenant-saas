@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using SaaS.Domain.Interfaces;
 
 namespace SaaS.Application.Common;
@@ -15,32 +15,30 @@ public interface IGenericService<TDto, TEntity> where TEntity : class
 public class GenericService<TDto, TEntity> : IGenericService<TDto, TEntity> where TEntity : class
 {
     protected readonly IUnitOfWork _unitOfWork;
-    protected readonly IMapper _mapper;
 
-    public GenericService(IUnitOfWork unitOfWork, IMapper mapper)
+    public GenericService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
     public async Task<IEnumerable<TDto>> GetAllAsync()
     {
         var entities = await _unitOfWork.Repository<TEntity>().GetAllAsync();
-        return _mapper.Map<IEnumerable<TDto>>(entities);
+        return entities.Adapt<IEnumerable<TDto>>();
     }
 
     public async Task<TDto?> GetByIdAsync(object id)
     {
         var entity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(id);
-        return _mapper.Map<TDto>(entity);
+        return entity.Adapt<TDto>();
     }
 
     public async Task<TDto> CreateAsync(TDto dto)
     {
-        var entity = _mapper.Map<TEntity>(dto);
+        var entity = dto.Adapt<TEntity>();
         await _unitOfWork.Repository<TEntity>().AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
-        return _mapper.Map<TDto>(entity);
+        return entity.Adapt<TDto>();
     }
 
     public async Task UpdateAsync(object id, TDto dto)
@@ -48,7 +46,7 @@ public class GenericService<TDto, TEntity> : IGenericService<TDto, TEntity> wher
         var entity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(id);
         if (entity == null) throw new Exception("Entity not found");
 
-        _mapper.Map(dto, entity);
+        dto.Adapt(entity);
         _unitOfWork.Repository<TEntity>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
     }

@@ -2,6 +2,7 @@ using GreenPantry.Application.DTOs.Auth;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 
 namespace GreenPantry.API.Controllers;
@@ -17,6 +18,7 @@ public class AuthController : BaseApiController
         _userRepository = userRepository;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
     {
@@ -24,6 +26,7 @@ public class AuthController : BaseApiController
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
@@ -31,6 +34,7 @@ public class AuthController : BaseApiController
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
@@ -50,6 +54,7 @@ public class AuthController : BaseApiController
         return Ok(new { message = "Logged out successfully" });
     }
 
+    [AllowAnonymous]
     [HttpPost("forgot-password")]
     public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
@@ -57,6 +62,7 @@ public class AuthController : BaseApiController
         return Ok(new { message = "If an account with that email exists, a password reset link has been sent." });
     }
 
+    [AllowAnonymous]
     [HttpPost("reset-password")]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {

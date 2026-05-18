@@ -1,4 +1,5 @@
-using AutoMapper;
+using Mapster;
+using MapsterMapper;
 using GreenPantry.Application.DTOs.Restaurant;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Domain.Entities;
@@ -10,16 +11,13 @@ namespace GreenPantry.Application.Services;
 public class RestaurantService : IRestaurantService
 {
     private readonly IRestaurantRepository _restaurantRepository;
-    private readonly IMapper _mapper;
     private readonly ILogger<RestaurantService> _logger;
 
     public RestaurantService(
         IRestaurantRepository restaurantRepository,
-        IMapper mapper,
         ILogger<RestaurantService> logger)
     {
         _restaurantRepository = restaurantRepository;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -65,7 +63,7 @@ public class RestaurantService : IRestaurantService
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize);
 
-        return _mapper.Map<IEnumerable<RestaurantDto>>(pagedRestaurants);
+        return pagedRestaurants.Adapt<IEnumerable<RestaurantDto>>();
     }
 
     public async Task<RestaurantDetailDto?> GetRestaurantByIdAsync(string id)
@@ -78,29 +76,22 @@ public class RestaurantService : IRestaurantService
             return null;
         }
 
-        return _mapper.Map<RestaurantDetailDto>(restaurant);
+        return restaurant.Adapt<RestaurantDetailDto>();
     }
 
     public async Task<RestaurantDto> CreateRestaurantAsync(RestaurantDto restaurantDto)
     {
         _logger.LogInformation("Creating new restaurant: {RestaurantName}", restaurantDto.Name);
 
-        var restaurantEntity = _mapper.Map<Restaurant>(restaurantDto);
+        var restaurantEntity = restaurantDto.Adapt<Restaurant>();
         // Default values
         restaurantEntity.Status = Domain.Enums.RestaurantStatus.Pending;
         restaurantEntity.CreatedAt = DateTime.UtcNow;
         restaurantEntity.UpdatedAt = DateTime.UtcNow;
         restaurantEntity.IsActive = true; 
         
-        // OwnerId handling? RestaurantDto has OwnerId in DetailDto but maybe not base?
-        // RestaurantDto definition has no OwnerId. RestaurantDetailDto has it.
-        // Assuming Owner assignment happens elsewhere or is not supported in this DTO flow.
-        // Or mapped if present. The Entity requires OwnerId.
-        // If Mapping fails to set OwnerId, validation might fail later. 
-        // Original code had no OwnerId arg in CreateRestaurantAsync.
-        
         var createdRestaurant = await _restaurantRepository.CreateAsync(restaurantEntity);
-        return _mapper.Map<RestaurantDto>(createdRestaurant);
+        return createdRestaurant.Adapt<RestaurantDto>();
     }
 
     public async Task<RestaurantDto> UpdateRestaurantAsync(string id, RestaurantDto restaurantDto)
@@ -113,11 +104,11 @@ public class RestaurantService : IRestaurantService
             throw new KeyNotFoundException($"Restaurant with ID {id} not found");
         }
 
-        _mapper.Map(restaurantDto, existingRestaurant);
+        restaurantDto.Adapt(existingRestaurant);
         existingRestaurant.UpdatedAt = DateTime.UtcNow;
 
         var updatedRestaurant = await _restaurantRepository.UpdateAsync(existingRestaurant);
-        return _mapper.Map<RestaurantDto>(updatedRestaurant);
+        return updatedRestaurant.Adapt<RestaurantDto>();
     }
 
     public async Task<bool> DeleteRestaurantAsync(string id)
@@ -142,6 +133,6 @@ public class RestaurantService : IRestaurantService
         _logger.LogInformation("Getting restaurants by owner: {OwnerId}", ownerId);
 
         var restaurants = await _restaurantRepository.GetByOwnerIdAsync(Guid.Parse(ownerId));
-        return _mapper.Map<IEnumerable<RestaurantDto>>(restaurants);
+        return restaurants.Adapt<IEnumerable<RestaurantDto>>();
     }
 }

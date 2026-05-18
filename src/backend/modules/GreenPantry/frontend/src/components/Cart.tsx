@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { CheckoutModal } from './CheckoutModal'
@@ -38,8 +39,8 @@ const Cart = () => {
       </button>
 
       {/* Cart Sidebar */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+      {isOpen && createPortal(
+        <div className="fixed inset-0 z-[100] overflow-hidden">
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsOpen(false)} />
 
           <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl">
@@ -143,7 +144,8 @@ const Cart = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Checkout Modal */}

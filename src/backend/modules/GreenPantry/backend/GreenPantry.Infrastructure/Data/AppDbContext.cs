@@ -17,6 +17,38 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
+ 
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is BaseEntity && (
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
+ 
+        foreach (var entityEntry in entries)
+        {
+            var entity = (BaseEntity)entityEntry.Entity;
+            entity.UpdatedAt = DateTime.UtcNow;
+ 
+            if (entityEntry.State == EntityState.Added)
+            {
+                entity.CreatedAt = DateTime.UtcNow;
+                if (string.IsNullOrEmpty(entity.CreatedBy))
+                {
+                    entity.CreatedBy = "System";
+                }
+            }
+            else
+            {
+                // Ensure CreatedBy is never overwritten with null during updates
+                entityEntry.Property("CreatedBy").IsModified = false;
+                entityEntry.Property("CreatedAt").IsModified = false;
+            }
+        }
+ 
+        return base.SaveChangesAsync(cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

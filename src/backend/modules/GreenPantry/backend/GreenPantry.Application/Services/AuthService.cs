@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using GreenPantry.Application.DTOs.Auth;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Domain.Entities;
@@ -10,26 +10,26 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace GreenPantry.Application.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
     private readonly EmailService _emailService;
 
     public AuthService(
         IUserRepository userRepository,
-        IMapper mapper,
         IConfiguration configuration,
         ILogger<AuthService> logger,
         EmailService emailService)
     {
         _userRepository = userRepository;
-        _mapper = mapper;
         _configuration = configuration;
         _logger = logger;
         _emailService = emailService;
@@ -91,9 +91,12 @@ public class AuthService : IAuthService
             var token = GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
+            int refreshExpiry = int.TryParse(_configuration["JwtSettings:RefreshTokenExpiryMinutes"], out int refExp) ? refExp : 30;
+            int tokenExpiry = int.TryParse(_configuration["JwtSettings:ExpiryMinutes"], out int exp) ? exp : 20;
+
             // Update user with refresh token
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(refreshExpiry);
             await _userRepository.UpdateAsync(user);
 
             _logger.LogInformation("User registered successfully with ID: {UserId}", user.Id);
@@ -102,8 +105,8 @@ public class AuthService : IAuthService
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                User = _mapper.Map<UserDto>(user)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(tokenExpiry),
+                User = user.Adapt<UserDto>()
             };
         }
         catch (Exception ex)
@@ -142,9 +145,12 @@ public class AuthService : IAuthService
             var token = GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
+            int refreshExpiry = int.TryParse(_configuration["JwtSettings:RefreshTokenExpiryMinutes"], out int refExp) ? refExp : 30;
+            int tokenExpiry = int.TryParse(_configuration["JwtSettings:ExpiryMinutes"], out int exp) ? exp : 20;
+
             // Update user with refresh token
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(refreshExpiry);
             await _userRepository.UpdateAsync(user);
 
             _logger.LogInformation("User logged in successfully with ID: {UserId}", user.Id);
@@ -153,8 +159,8 @@ public class AuthService : IAuthService
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                User = _mapper.Map<UserDto>(user)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(tokenExpiry),
+                User = user.Adapt<UserDto>()
             };
         }
         catch (Exception ex)
@@ -176,17 +182,20 @@ public class AuthService : IAuthService
         var newToken = GenerateJwtToken(user);
         var newRefreshToken = GenerateRefreshToken();
 
+        int refreshExpiry = int.TryParse(_configuration["JwtSettings:RefreshTokenExpiryMinutes"], out int refExp) ? refExp : 30;
+        int tokenExpiry = int.TryParse(_configuration["JwtSettings:ExpiryMinutes"], out int exp) ? exp : 20;
+
         // Update user with new refresh token
         user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(refreshExpiry);
         await _userRepository.UpdateAsync(user);
 
         return new AuthResponse
         {
             Token = newToken,
             RefreshToken = newRefreshToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-            User = _mapper.Map<UserDto>(user)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(tokenExpiry),
+            User = user.Adapt<UserDto>()
         };
     }
 
@@ -240,6 +249,8 @@ public class AuthService : IAuthService
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!);
+        int tokenExpiry = int.TryParse(_configuration["JwtSettings:ExpiryMinutes"], out int exp) ? exp : 20;
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -249,7 +260,7 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
             }),
-            Expires = DateTime.UtcNow.AddMinutes(60),
+            Expires = DateTime.UtcNow.AddMinutes(tokenExpiry),
             Issuer = _configuration["JwtSettings:Issuer"],
             Audience = _configuration["JwtSettings:Audience"],
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -303,8 +314,56 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send password reset email to: {Email}. Error: {Error}", email, ex.Message);
-            // Don't throw - still return success to prevent email enumeration
-            // Email functionality can be configured later with proper SMTP credentials
+            
+            // WHATSAPP FALLBACK
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                _logger.LogWarning("Attempting WhatsApp fallback for: {Phone}", user.PhoneNumber);
+                try
+                {
+                    await SendWhatsAppResetLink(user.PhoneNumber, resetLink);
+                    _logger.LogInformation("WhatsApp reset link sent to: {Phone}", user.PhoneNumber);
+                }
+                catch (Exception wEx)
+                {
+                    _logger.LogError(wEx, "WhatsApp fallback failed: {Error}", wEx.Message);
+                }
+            }
+        }
+    }
+
+    private async Task SendWhatsAppResetLink(string phoneNumber, string resetLink)
+    {
+        var token = _configuration["PaymentProviders:WhatsApp:AccessToken"];
+        var phoneId = _configuration["PaymentProviders:WhatsApp:PhoneNumberId"];
+        var version = _configuration["PaymentProviders:WhatsApp:ApiVersion"] ?? "v25.0";
+
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(phoneId))
+        {
+            throw new InvalidOperationException("WhatsApp API credentials not configured");
+        }
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var payload = new
+        {
+            messaging_product = "whatsapp",
+            to = phoneNumber.Replace("+", "").Replace(" ", ""),
+            type = "template",
+            template = new
+            {
+                name = "hello_world",
+                language = new { code = "en_US" }
+            }
+        };
+
+        var response = await client.PostAsJsonAsync($"https://graph.facebook.com/{version}/{phoneId}/messages", payload);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"WhatsApp API error: {error}");
         }
     }
 

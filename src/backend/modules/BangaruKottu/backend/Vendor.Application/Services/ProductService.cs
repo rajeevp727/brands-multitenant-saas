@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using Vendor.Application.DTOs.Product;
 using Vendor.Application.Interfaces;
 using Vendor.Domain.Entities;
@@ -9,22 +9,19 @@ public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
     private readonly IRepository<Category> _categoryRepository;
-    private readonly IMapper _mapper;
 
     public ProductService(
         IProductRepository productRepository,
-        IRepository<Category> categoryRepository,
-        IMapper mapper)
+        IRepository<Category> categoryRepository)
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
-        _mapper = mapper;
     }
 
     public async Task<IEnumerable<ProductDto>> GetVendorProductsAsync(int vendorId)
     {
         var products = await _productRepository.GetByVendorIdAsync(vendorId);
-        return _mapper.Map<IEnumerable<ProductDto>>(products);
+        return products.Adapt<IEnumerable<ProductDto>>();
     }
 
     public async Task<ProductDto?> GetProductByIdAsync(int productId, int vendorId)
@@ -33,7 +30,7 @@ public class ProductService : IProductService
         if (product == null || product.VendorId != vendorId)
             return null;
 
-        return _mapper.Map<ProductDto>(product);
+        return product.Adapt<ProductDto>();
     }
 
     public async Task<ProductDto> CreateProductAsync(int vendorId, CreateProductRequest request)
@@ -57,7 +54,7 @@ public class ProductService : IProductService
 
         var createdProduct = await _productRepository.AddAsync(product);
         var productWithDetails = await _productRepository.GetProductWithDetailsAsync(createdProduct.ProductId);
-        return _mapper.Map<ProductDto>(productWithDetails!);
+        return productWithDetails!.Adapt<ProductDto>();
     }
 
     public async Task<ProductDto?> UpdateProductAsync(int productId, int vendorId, UpdateProductRequest request)
@@ -80,7 +77,7 @@ public class ProductService : IProductService
         await _productRepository.UpdateAsync(product);
 
         var updatedProduct = await _productRepository.GetProductWithDetailsAsync(productId);
-        return _mapper.Map<ProductDto>(updatedProduct);
+        return updatedProduct.Adapt<ProductDto>();
     }
 
     public async Task<bool> DeleteProductAsync(int productId, int vendorId)

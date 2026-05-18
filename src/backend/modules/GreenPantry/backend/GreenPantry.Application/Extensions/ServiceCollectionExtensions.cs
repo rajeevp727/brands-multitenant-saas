@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using FluentValidation;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Application.Mappings;
@@ -11,8 +11,10 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Add AutoMapper
-        services.AddAutoMapper(typeof(MappingProfile));
+        // Add Mapster
+        MapsterConfig.Configure();
+        services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+        services.AddScoped<MapsterMapper.IMapper, MapsterMapper.Mapper>();
 
         // Add FluentValidation
         services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);

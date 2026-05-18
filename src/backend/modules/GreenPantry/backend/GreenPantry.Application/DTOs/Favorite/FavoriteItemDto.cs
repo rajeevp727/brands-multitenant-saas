@@ -11,7 +11,7 @@ public class FavoriteItemDto
     // Shared
     public string Name { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
-    public DateTime AddedDate { get; set; }
+    public DateTime? AddedDate { get; set; }
 
     // Restaurant specific
     public string Cuisine { get; set; } = string.Empty;

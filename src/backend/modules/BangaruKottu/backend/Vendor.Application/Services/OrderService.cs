@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using Vendor.Application.DTOs.Order;
 using Vendor.Application.Interfaces;
 
@@ -7,18 +7,16 @@ namespace Vendor.Application.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly IMapper _mapper;
 
-    public OrderService(IOrderRepository orderRepository, IMapper mapper)
+    public OrderService(IOrderRepository orderRepository)
     {
         _orderRepository = orderRepository;
-        _mapper = mapper;
     }
 
     public async Task<IEnumerable<OrderDto>> GetVendorOrdersAsync(int vendorId)
     {
         var orders = await _orderRepository.GetByVendorIdAsync(vendorId);
-        return _mapper.Map<IEnumerable<OrderDto>>(orders);
+        return orders.Adapt<IEnumerable<OrderDto>>();
     }
 
     public async Task<OrderDto?> GetOrderByIdAsync(int orderId, int vendorId)
@@ -27,7 +25,7 @@ public class OrderService : IOrderService
         if (order == null || order.VendorId != vendorId)
             return null;
 
-        return _mapper.Map<OrderDto>(order);
+        return order.Adapt<OrderDto>();
     }
 
     public async Task<bool> AcceptOrderAsync(int orderId, int vendorId)

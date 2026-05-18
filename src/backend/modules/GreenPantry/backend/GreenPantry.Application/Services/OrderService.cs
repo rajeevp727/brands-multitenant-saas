@@ -1,4 +1,5 @@
-using AutoMapper;
+using Mapster;
+using MapsterMapper;
 using GreenPantry.Application.DTOs.Order;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Domain.Entities;
@@ -12,20 +13,17 @@ public class OrderService : IOrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IMenuItemRepository _menuItemRepository;
     private readonly INotificationService _notificationService;
-    private readonly IMapper _mapper;
     private readonly ILogger<OrderService> _logger;
 
     public OrderService(
         IOrderRepository orderRepository,
         IMenuItemRepository menuItemRepository,
         INotificationService notificationService,
-        IMapper mapper,
         ILogger<OrderService> logger)
     {
         _orderRepository = orderRepository;
         _menuItemRepository = menuItemRepository;
         _notificationService = notificationService;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -39,7 +37,7 @@ public class OrderService : IOrderService
             RestaurantId = Guid.Parse(request.RestaurantId),
             OrderNumber = GenerateOrderNumber(),
             Status = OrderStatus.Pending,
-            DeliveryAddress = _mapper.Map<Address>(request.DeliveryAddress),
+            DeliveryAddress = request.DeliveryAddress.Adapt<Address>(),
             PaymentMethod = request.PaymentMethod,
             DeliveryInstructions = request.DeliveryInstructions,
             CreatedAt = DateTime.UtcNow,
@@ -118,7 +116,7 @@ public class OrderService : IOrderService
             // Don't fail the order if notification fails
         }
 
-        return _mapper.Map<OrderDto>(createdOrder);
+        return createdOrder.Adapt<OrderDto>();
     }
 
     public async Task<OrderDto?> GetOrderByIdAsync(string id)
@@ -131,7 +129,7 @@ public class OrderService : IOrderService
             return null;
         }
 
-        return _mapper.Map<OrderDto>(order);
+        return order.Adapt<OrderDto>();
     }
 
     public async Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(string userId)
@@ -141,7 +139,7 @@ public class OrderService : IOrderService
         var orders = await _orderRepository.GetByUserIdAsync(Guid.Parse(userId));
         var activeOrders = orders.Where(o => !o.IsDeleted).OrderByDescending(o => o.CreatedAt);
 
-        return _mapper.Map<IEnumerable<OrderDto>>(activeOrders);
+        return activeOrders.Adapt<IEnumerable<OrderDto>>();
     }
 
     public async Task<IEnumerable<OrderDto>> GetOrdersByRestaurantIdAsync(string restaurantId)
@@ -151,7 +149,7 @@ public class OrderService : IOrderService
         var orders = await _orderRepository.GetByRestaurantIdAsync(Guid.Parse(restaurantId));
         var activeOrders = orders.Where(o => !o.IsDeleted).OrderByDescending(o => o.CreatedAt);
 
-        return _mapper.Map<IEnumerable<OrderDto>>(activeOrders);
+        return activeOrders.Adapt<IEnumerable<OrderDto>>();
     }
 
     public async Task<OrderDto> UpdateOrderStatusAsync(string id, UpdateOrderStatusRequest request)
@@ -177,7 +175,7 @@ public class OrderService : IOrderService
         });
 
         var updatedOrder = await _orderRepository.UpdateAsync(order);
-        return _mapper.Map<OrderDto>(updatedOrder);
+        return updatedOrder.Adapt<OrderDto>();
     }
 
     public async Task<bool> CancelOrderAsync(string id, string userId)

@@ -7,8 +7,8 @@ public static class DbInitializer
 {
     public static async Task InitializeAsync(ApplicationDbContext context)
     {
-        // Ensure database is created
-        await context.Database.EnsureCreatedAsync();
+        // Ensure database and schema are created via migrations
+        await context.Database.MigrateAsync();
 
         if (await context.Products.AnyAsync())
         {

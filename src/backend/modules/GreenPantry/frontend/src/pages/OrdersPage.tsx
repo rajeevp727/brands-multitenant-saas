@@ -1,122 +1,24 @@
 import { useState } from 'react'
-import { Clock, MapPin, Star, Repeat, Eye, Filter } from 'lucide-react'
+import { Clock, MapPin, Star, Repeat, Eye, Filter, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useOrderStore, Order } from '../store/orderStore'
 
 const OrdersPage = () => {
+  const { orders } = useOrderStore()
   const [selectedStatus, setSelectedStatus] = useState('All')
   const [selectedPeriod, setSelectedPeriod] = useState('All')
 
-  const statuses = ['All', 'Delivered', 'In Progress', 'Cancelled', 'Refunded']
+  const statuses = ['All', 'Pending', 'Confirmed', 'Preparing', 'On the Way', 'Delivered', 'Cancelled', 'Refunded']
   const periods = ['All', 'This Week', 'This Month', 'Last 3 Months', 'This Year']
-
-  const orders = [
-    {
-      id: 'ORD-001',
-      restaurant: {
-        name: 'Spice Garden',
-        image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=100',
-        rating: 4.5
-      },
-      items: [
-        { name: 'Chicken Biryani', quantity: 2, price: 350 },
-        { name: 'Dal Makhani', quantity: 1, price: 280 }
-      ],
-      total: 980,
-      status: 'Delivered',
-      orderDate: '2024-01-15T18:30:00Z',
-      deliveryDate: '2024-01-15T19:15:00Z',
-      deliveryAddress: '123 MG Road, Mumbai',
-      paymentMethod: 'UPI',
-      deliveryFee: 50,
-      discount: 100
-    },
-    {
-      id: 'ORD-002',
-      restaurant: {
-        name: 'Dragon Palace',
-        image: 'https://images.unsplash.com/photo-1563379091339-03246963d4d4?w=100',
-        rating: 4.3
-      },
-      items: [
-        { name: 'Chicken Manchurian', quantity: 1, price: 320 },
-        { name: 'Fried Rice', quantity: 1, price: 200 }
-      ],
-      total: 520,
-      status: 'In Progress',
-      orderDate: '2024-01-14T20:15:00Z',
-      deliveryDate: null,
-      deliveryAddress: '123 MG Road, Mumbai',
-      paymentMethod: 'Credit Card',
-      deliveryFee: 40,
-      discount: 0
-    },
-    {
-      id: 'ORD-003',
-      restaurant: {
-        name: 'Bella Vista',
-        image: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=100',
-        rating: 4.7
-      },
-      items: [
-        { name: 'Margherita Pizza', quantity: 1, price: 450 },
-        { name: 'Caesar Salad', quantity: 1, price: 280 }
-      ],
-      total: 730,
-      status: 'Delivered',
-      orderDate: '2024-01-12T19:45:00Z',
-      deliveryDate: '2024-01-12T20:30:00Z',
-      deliveryAddress: '123 MG Road, Mumbai',
-      paymentMethod: 'Cash on Delivery',
-      deliveryFee: 60,
-      discount: 50
-    },
-    {
-      id: 'ORD-004',
-      restaurant: {
-        name: 'Thai Corner',
-        image: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=100',
-        rating: 4.4
-      },
-      items: [
-        { name: 'Pad Thai', quantity: 1, price: 380 },
-        { name: 'Tom Yum Soup', quantity: 1, price: 250 }
-      ],
-      total: 630,
-      status: 'Cancelled',
-      orderDate: '2024-01-10T21:00:00Z',
-      deliveryDate: null,
-      deliveryAddress: '123 MG Road, Mumbai',
-      paymentMethod: 'UPI',
-      deliveryFee: 45,
-      discount: 0
-    },
-    {
-      id: 'ORD-005',
-      restaurant: {
-        name: 'Burger Junction',
-        image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=100',
-        rating: 4.2
-      },
-      items: [
-        { name: 'Classic Cheeseburger', quantity: 2, price: 250 },
-        { name: 'Chicken Wings', quantity: 1, price: 280 }
-      ],
-      total: 780,
-      status: 'Refunded',
-      orderDate: '2024-01-08T17:20:00Z',
-      deliveryDate: '2024-01-08T18:00:00Z',
-      deliveryAddress: '123 MG Road, Mumbai',
-      paymentMethod: 'Credit Card',
-      deliveryFee: 35,
-      discount: 0
-    }
-  ]
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Delivered':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-      case 'In Progress':
+      case 'Pending':
+      case 'Confirmed':
+      case 'Preparing':
+      case 'On the Way':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
       case 'Cancelled':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -221,13 +123,43 @@ const OrdersPage = () => {
                   </div>
                 </div>
 
+                {/* Active Order Tracker */}
+                {['Pending', 'Confirmed', 'Preparing', 'On the Way'].includes(order.status) && (
+                  <div className="mb-6 bg-blue-50 dark:bg-gray-700/50 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                    <h4 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center">
+                      <Clock className="w-4 h-4 mr-2 animate-pulse" /> Live Order Tracking
+                    </h4>
+                    <div className="flex items-center justify-between relative">
+                      <div className="absolute left-0 top-1/2 w-full h-1 bg-gray-200 dark:bg-gray-600 -z-10 -translate-y-1/2"></div>
+                      
+                      {['Pending', 'Confirmed', 'Preparing', 'On the Way', 'Delivered'].map((step, idx) => {
+                        const statusOrder = ['Pending', 'Confirmed', 'Preparing', 'On the Way', 'Delivered'];
+                        const currentIdx = statusOrder.indexOf(order.status);
+                        const isCompleted = idx <= currentIdx;
+                        const isCurrent = idx === currentIdx;
+                        
+                        return (
+                          <div key={step} className="flex flex-col items-center">
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isCompleted ? 'bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/50' : 'bg-gray-200 dark:bg-gray-600 text-transparent'} transition-colors duration-500`}>
+                              <CheckCircle2 className="w-3 h-3" />
+                            </div>
+                            <span className={`text-[10px] sm:text-xs mt-2 font-medium ${isCurrent ? 'text-blue-700 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                              {step}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Order Items */}
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Items Ordered:</h4>
                   <div className="space-y-1">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                        <span>{item.quantity}x {item.name}</span>
+                        <span>{item.name}</span>
                         <span>₹{item.price * item.quantity}</span>
                       </div>
                     ))}

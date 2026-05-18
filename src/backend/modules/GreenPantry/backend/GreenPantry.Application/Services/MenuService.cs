@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using GreenPantry.Application.DTOs.Menu;
 using GreenPantry.Application.Interfaces;
 using GreenPantry.Domain.Entities;
@@ -9,16 +9,13 @@ namespace GreenPantry.Application.Services;
 public class MenuService : IMenuService
 {
     private readonly IMenuItemRepository _menuItemRepository;
-    private readonly IMapper _mapper;
     private readonly ILogger<MenuService> _logger;
 
     public MenuService(
         IMenuItemRepository menuItemRepository,
-        IMapper mapper,
         ILogger<MenuService> logger)
     {
         _menuItemRepository = menuItemRepository;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -34,7 +31,7 @@ public class MenuService : IMenuService
             .Select(g => new MenuCategoryDto
             {
                 Category = g.Key,
-                Items = _mapper.Map<List<MenuItemDto>>(g.ToList())
+                Items = g.ToList().Adapt<List<MenuItemDto>>()
             })
             .OrderBy(c => c.Category);
 
@@ -51,19 +48,19 @@ public class MenuService : IMenuService
             return null;
         }
 
-        return _mapper.Map<MenuItemDto>(menuItem);
+        return menuItem.Adapt<MenuItemDto>();
     }
 
     public async Task<MenuItemDto> CreateMenuItemAsync(MenuItemDto menuItem)
     {
         _logger.LogInformation("Creating new menu item: {MenuItemName}", menuItem.Name);
 
-        var menuItemEntity = _mapper.Map<MenuItem>(menuItem);
+        var menuItemEntity = menuItem.Adapt<MenuItem>();
         menuItemEntity.CreatedAt = DateTime.UtcNow;
         menuItemEntity.UpdatedAt = DateTime.UtcNow;
 
         var createdMenuItem = await _menuItemRepository.CreateAsync(menuItemEntity);
-        return _mapper.Map<MenuItemDto>(createdMenuItem);
+        return createdMenuItem.Adapt<MenuItemDto>();
     }
 
     public async Task<MenuItemDto> UpdateMenuItemAsync(string id, MenuItemDto menuItem)
@@ -76,11 +73,11 @@ public class MenuService : IMenuService
             throw new KeyNotFoundException($"Menu item with ID {id} not found");
         }
 
-        _mapper.Map(menuItem, existingMenuItem);
+        menuItem.Adapt(existingMenuItem);
         existingMenuItem.UpdatedAt = DateTime.UtcNow;
 
         var updatedMenuItem = await _menuItemRepository.UpdateAsync(existingMenuItem);
-        return _mapper.Map<MenuItemDto>(updatedMenuItem);
+        return updatedMenuItem.Adapt<MenuItemDto>();
     }
 
     public async Task<bool> DeleteMenuItemAsync(string id)
@@ -107,6 +104,6 @@ public class MenuService : IMenuService
         var menuItems = await _menuItemRepository.GetByRestaurantIdAsync(Guid.Parse(restaurantId));
         var availableItems = menuItems.Where(m => !m.IsDeleted);
 
-        return _mapper.Map<IEnumerable<MenuItemDto>>(availableItems);
+        return availableItems.Adapt<IEnumerable<MenuItemDto>>();
     }
 }

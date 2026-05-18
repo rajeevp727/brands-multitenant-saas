@@ -7,6 +7,7 @@ namespace SaaS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class SystemController : ControllerBase
 {
     private readonly ISystemService _systemService;
@@ -17,7 +18,6 @@ public class SystemController : ControllerBase
     }
 
     [HttpGet("status")]
-    [AllowAnonymous]
     public async Task<IActionResult> GetStatus()
     {
         var isDeploying = await _systemService.IsDeploymentActiveAsync();
@@ -27,7 +27,6 @@ public class SystemController : ControllerBase
     // Webhook for Vercel/Render
     // Note: In production, you'd want to verify a secret token in the header
     [HttpPost("webhook/deploy-start")]
-    [AllowAnonymous]
     public async Task<IActionResult> OnDeployStart()
     {
         await _systemService.SetDeploymentStatusAsync(true);
@@ -35,7 +34,6 @@ public class SystemController : ControllerBase
     }
 
     [HttpPost("webhook/deploy-success")]
-    [AllowAnonymous]
     public async Task<IActionResult> OnDeploySuccess()
     {
         await _systemService.SetDeploymentStatusAsync(false);

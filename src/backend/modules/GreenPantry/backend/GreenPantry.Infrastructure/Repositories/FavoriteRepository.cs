@@ -18,7 +18,7 @@ public class FavoriteRepository : IFavoriteRepository
         _context = context;
     }
 
-    public async Task<Favorite> GetFavoriteAsync(string userId, string itemId, string itemType)
+    public async Task<Favorite?> GetFavoriteAsync(string userId, string itemId, string itemType)
     {
         return await _context.Favorites
             .FirstOrDefaultAsync(f => f.UserId == userId && f.ItemId == itemId && f.ItemType == itemType);

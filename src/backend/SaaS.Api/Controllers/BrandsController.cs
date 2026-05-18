@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
+using Mapster;
 using SaaS.Application.DTOs;
 using SaaS.Application.Common;
 using SaaS.Domain.Entities;
@@ -15,17 +15,13 @@ public class BrandsController : ControllerBase
 {
     private readonly IGenericService<BrandDto, Brand> _brandService;
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
-
-    public BrandsController(IGenericService<BrandDto, Brand> brandService, ApplicationDbContext context, IMapper mapper)
+    public BrandsController(IGenericService<BrandDto, Brand> brandService, ApplicationDbContext context)
     {
         _brandService = brandService;
         _context = context;
-        _mapper = mapper;
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> GetAllBrands()
     {
         // Bypass tenant filtering to get all brands from all tenants
@@ -34,7 +30,7 @@ public class BrandsController : ControllerBase
             .Where(b => b.IsVisible)
             .ToListAsync();
         
-        var brandDtos = _mapper.Map<List<BrandDto>>(brands);
+        var brandDtos = brands.Adapt<List<BrandDto>>();
         
         // Extract metadata from ConfigJson for each brand
         foreach (var brandDto in brandDtos)

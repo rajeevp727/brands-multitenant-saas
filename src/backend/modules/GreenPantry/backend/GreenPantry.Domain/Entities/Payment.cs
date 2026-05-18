@@ -30,7 +30,6 @@ public class Payment : BaseEntity
 public class PaymentWebhook
 {
     public string WebhookEventId { get; set; } = Guid.NewGuid().ToString();
-    public string PaymentId { get; set; } = string.Empty;
     public PaymentProvider Provider { get; set; }
     public string EventType { get; set; } = string.Empty;
     public string RawPayload { get; set; } = string.Empty;

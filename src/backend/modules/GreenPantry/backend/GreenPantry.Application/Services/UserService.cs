@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using GreenPantry.Application.DTOs.Auth;
 using GreenPantry.Application.DTOs.Order;
 using GreenPantry.Application.Interfaces;
@@ -10,18 +10,15 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IOrderRepository _orderRepository;
-    private readonly IMapper _mapper;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
         IUserRepository userRepository,
         IOrderRepository orderRepository,
-        IMapper mapper,
         ILogger<UserService> logger)
     {
         _userRepository = userRepository;
         _orderRepository = orderRepository;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -35,7 +32,7 @@ public class UserService : IUserService
             return null;
         }
 
-        return _mapper.Map<UserDto>(user);
+        return user.Adapt<UserDto>();
     }
 
     public async Task<UserDto> UpdateUserProfileAsync(string id, UserDto user)
@@ -62,7 +59,7 @@ public class UserService : IUserService
         existingUser.UpdatedAt = DateTime.UtcNow;
 
         var updatedUser = await _userRepository.UpdateAsync(existingUser);
-        return _mapper.Map<UserDto>(updatedUser);
+        return updatedUser.Adapt<UserDto>();
     }
 
     public async Task<bool> UpdateUserAddressAsync(string id, GreenPantry.Application.DTOs.Auth.AddressDto address)
@@ -95,6 +92,6 @@ public class UserService : IUserService
         var orders = await _orderRepository.GetByUserIdAsync(Guid.Parse(userId));
         var activeOrders = orders.Where(o => !o.IsDeleted).OrderByDescending(o => o.CreatedAt);
 
-        return _mapper.Map<IEnumerable<OrderDto>>(activeOrders);
+        return activeOrders.Adapt<IEnumerable<OrderDto>>();
     }
 }
